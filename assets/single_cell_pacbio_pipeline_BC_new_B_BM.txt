@@ -1,0 +1,343 @@
+Iso Seq Single Cell Analysis: Recommended Analysis Guidelines
+
+######
+0. before starting activate python evironment
+
+source ./anaconda2/etc/profile.d/conda.sh 
+which conda
+/etc/samba/mos6/user_homes/mos6/anaconda2/condabin/conda
+conda activate anaCogent3	
+(anaCogent3) mos6@tbio-X9DAi:/etc/samba/mos6/user_homes/mos6$ 
+
+# if cupcake is not in PYTHONPATH do this:
+export PYTHONPATH=~/cDNA_Cupcake/sequence/:$PYTHONPATH
+
+
+
+
+
+##############
+1. Generate CCS Reads
+
+ccs 3.4.1 (commit v3.4.1)
+
+ccs --logFile --log-level "INFO" --noPolish --minPasses 1 --draft-mode windowed -j 25 XMSGU_20191023_S64018_PL100140639-1_A01_bc1016-bc1016.bam KPC.ccs.bam 
+
+ccs --log-level INFO --noPolish --minPasses 1 --draft-mode windowed -j 25 XMSGU_20191023_S64018_PL100140641-1_A01_bc1018-bc1018.bam B_BM_tot.ccs.bam
+
+##############################
+2. Detect and Remove 5' and 3' Primers
+
+
+lima --version
+lima 1.9.0 (commit v1.9.0)
+
+lima --isoseq --dump-clips  -j 25 KPC.ccs.bam 10xprimers.fasta KPC.ccs.lima.bam     
+
+lima  --isoseq  -j 25 B_BM_tot.ccs.bam 10xprimers.fasta B_BM_tot.ccs.lima.bam
+
+#important not to confuse 5' and 3'!!
+>5p
+AAGCAGTGGTATCAACGCAGAGTACATGGG
+>3p
+CTACACGACGCTCTTCCGATCT
+
+ZMWs input                (A) : 417122
+ZMWs above all thresholds (B) : 281469 (67%)
+ZMWs below any threshold  (C) : 135653 (33%)
+
+ZMW marginals for (C):
+Below min length              : 3 (0%)
+Below min score               : 0 (0%)
+Below min end score           : 20358 (15%)
+Below min passes              : 37 (0%)
+Below min score lead          : 0 (0%)
+Below min ref span            : 11885 (9%)
+Without adapter               : 4 (0%)
+Undesired 5p--5p pairs        : 3331 (2%)
+Undesired 3p--3p pairs        : 116838 (86%)
+Undesired no hit              : 4 (0%)
+
+ZMWs for (B):
+With different barcodes       : 281469 (100%)
+Coefficient of correlation    : 0%
+
+ZMWs for (A):
+Allow diff barcode pair       : 417085 (100%)
+Allow same barcode pair       : 417085 (100%)
+
+Reads for (B):
+Above length                  : 281469 (100%)
+Below length                  : 0 (0%)
+
+#################################
+3. Detect UMIs and Cell Barcodes
+
+
+python cDNA_Cupcake/singlecell/clip_out_UMI_cellBC.py -h
+usage: clip_out_UMI_cellBC.py [-h] [-u UMI_LEN] [-b BC_LEN] [-t TSO_LEN]
+                              [--umi_type {A3,G5,G5-10X}]
+                              [--bc_rank_file BC_RANK_FILE]
+                              bam_filename output_prefix
+
+positional arguments:
+  bam_filename          CCS BAM with cDNA primer removed (post LIMA)
+  output_prefix         Output prefix
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -u UMI_LEN, --umi_len UMI_LEN
+                        Length of UMI
+  -b BC_LEN, --bc_len BC_LEN
+                        Length of cell barcode
+  -t TSO_LEN, --tso_len TSO_LEN
+                        Length of TSO (for G5-10X only)
+  --umi_type {A3,G5,G5-10X}
+                        Location of the UMI
+  --bc_rank_file BC_RANK_FILE
+                        (Optional) cell barcode rank file from short read data
+
+from the chromium manual:                                                       
+16 nt 10x Barcode
+12 nt unique molecular identifier (UMI)
+30 nt poly(dT) sequence
+
+A3 to indicate that the UMI and BC is on the 3' end after the polyA tail
+
+python cDNA_Cupcake/singlecell/clip_out_UMI_cellBC.py \
+		scRNA/PacBio/lima_output/KPC.ccs.lima.5p--3p.bam \
+		10x -u 12 -b 16 --umi_type A3
+		
+###
+with Barcode list
+
+python cDNA_Cupcake/singlecell/clip_out_UMI_cellBC.py scRNA/PacBio/single_cell_pipeline/lima_output_3pass_corr/B_BM_tot.lima.pass3_ccs.5p--3p.bam B_BM_tot_10x_BC -u 12 -b 16 --umi_type A3 --bc_rank_file scRNA/cell_barcodes/B_BM_tot_barcodes_ranked.txt
+python cDNA_Cupcake/singlecell/clip_out_UMI_cellBC.py scRNA/PacBio/single_cell_pipeline/lima_output_3pass_corr/Blin_neg.lima.pass3_ccs.5p--3p.bam B_lin_neg_10x_BC -u 12 -b 16 --umi_type A3 --bc_rank_file scRNA/cell_barcodes/Blin_neg_barcodes.tsv
+
+OUTPUT:
+_10x.trimmed.BAM
+_10x.trimmed.csv 
+csv contains 
+id	clip_len	extra	UMI	BC	BC_rev	BC_match	BC_top_rank
+m64018_191023_184714/731/ccs	28	NA	ACAAAACAAAAA	AAACAAATCCCATGTA	TACATGGGATTTGTTT	N	N
+
+
+###############################
+4. Remove polyA Tail and Artificial Concatemers
+
+isoseq3 refine -h
+isoseq3 refine - Remove polyA and concatemers from FL reads and generate FLNC transcripts (FL to FLNC)
+
+Usage:
+  isoseq refine [options] <ccs.demux.bam|xml> <primer.fasta|xml> <flnc.bam|xml>
+
+  ccs.demux.bam|xml   STR   Input demuxed ccs BAM or ConsensusReadSet XML
+  primer.fasta|xml    STR   Input primer FASTA or BarcodeSet XML
+  flnc.bam|xml        STR   Output flnc BAM or ConsensusReadSet XML
+
+Preprocessing:
+  --min-polya-length  INT   Minimum poly(A) tail length. [20]
+  --require-polya           Require FL reads to have a poly(A) tail and remove it.
+
+  -h,--help                 Show this help and exit.
+  --version                 Show application version and exit.
+  -j,--num-threads    INT   Number of threads to use, 0 means autodetection. [0]
+  --log-level         STR   Set log level. Valid choices: (TRACE, DEBUG, INFO, WARN, FATAL). [WARN]
+  --log-file          FILE  Log to a file, instead of stderr.
+  -v,--verbose              Use verbose output.
+
+
+###
+with Barcode list
+isoseq3 refine B_BM_tot_10x_BC.trimmed.bam 10xprimers.fasta -j 15 -v B_BM_tot.flnc_BC.bam --require-polya
+isoseq3 refine B_lin_neg_10x_BC.trimmed.bam 10xprimers.fasta -j 15 -v B_lin_neg.flnc_BC.bam --require-polya
+
+
+###########################
+5. Align to Genome
+
+bamtools convert -format fasta -in B_BM_tot.flnc_BC.bam > B_BM_tot.flnc_BC.fasta
+bamtools convert -format fasta -in Blin_neg.flnc_BC.bam > Blin_neg.flnc_BC.fasta
+
+minimap2 -t 30 -ax splice -uf --secondary=no -C5  genome_hg38/hg38.fa scRNA/PacBio/single_cell_pipeline/trim_3pass_BC/B_BM_tot.flnc_BC.fasta > B_BM_tot.3pass.flnc_BC.fasta.sam 2> B_BM_tot.3pass.flnc_BC.fasta.sam.log
+minimap2 -t 30 -ax splice -uf --secondary=no -C5  genome_hg38/hg38.fa scRNA/PacBio/single_cell_pipeline/trim_3pass_BC/Blin_neg.flnc_BC.fasta > Blin_neg.3pass.flnc_BC.fasta.sam 2> Blin_neg.3pass.flnc_BC.fasta.sam.log
+
+#convert sam to bam, sort, index
+
+samtools view  -@ 30 -b B_BM_tot.3pass.flnc_BC.fasta.sam | samtools sort -@ 30 -m 1G > B_BM_tot.3pass.flnc_BC.fasta.sort.bam
+samtools view  -@ 30 -b Alin_neg.3pass.flnc_BC.fasta.sam | samtools sort -@ 30 -m 1G > Alin_neg.3pass.flnc_BC.fasta.bam
+
+index bam
+
+samtools index B_BM_tot.3pass.flnc.fasta.bam
+
+
+##########################
+6. Collapse into Unique Transcripts
+
+sort -k 3,3 -k 4,4n flnc.fasta.sam > flnc.fasta.sorted.sam
+collapse_isoforms_by_sam.py --input flnc.fasta \
+      -s flnc.fasta.sorted.sam -c 0.99 -i 0.95 -o flnc.5merge
+
+#removes header, sort by column 3 and 4 (numerical value) also can use samtools sort (keeps header)
+
+sort -k 3,3 -k 4,4n B_BM_tot.3pass.flnc_BC.fasta.sam > B_BM_tot.3pass.flnc_BC.fasta.sort.sam
+sort -k 3,3 -k 4,4n Blin_neg.3pass.flnc_BC.fasta.sam > Blin_neg.3pass.flnc_BC.fasta.sort.sam
+
+#collapse
+**************************
+
+collapse_isoforms_by_sam.py --input trim_3pass_BC/B_BM_tot.flnc_BC.fasta -s mmp2_output_3pass_BC/B_BM_tot.3pass.flnc_BC.fasta.sort.sam  -c 0.99 -i 0.95 -o  B_BM_tot.3pass.sort.flnc_BC.merge5
+collapse_isoforms_by_sam.py --input trim_3pass_BC/Blin_neg.flnc_BC.fasta -s mmp2_output_3pass_BC/Blin_neg.3pass.flnc_BC.fasta.sort.sam  -c 0.99 -i 0.95 -o  Blin_neg.3pass.sort.flnc_BC.merge5
+
+
+(you can change cutoff using -c option, default is 0.99), too low identity (-i option, default is 0.85).
+
+
+##########################
+7. Compare Against Annotation --geneid adds gene names
+
+
+###
+with Barcode list
+
+python SQANTI2-master/sqanti_qc2.py -t 30 --gtf scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/B_BM_tot.3pass.sort.flnc_BC.merge5.collapsed.gff \
+     genes_hs/gencode.v32.annotation.gtf genome_hg38/hg38.fa \
+     --polyA_motif_list PacBio/Sqanti_input/human.polyA.list.txt \
+     --cage_peak PacBio/Sqanti_input/hg38.cage_peak_phase1and2combined_coord.bed \
+     -c PacBio/Sqanti_input/intropolis.v1.hg19_with_liftover_to_hg38.tsv.min_count_10.modified \
+	 --geneid
+
+python SQANTI2-master/sqanti_qc2.py -t 30 --gtf scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/Alin_neg.3pass.sort.flnc_BC.merge5.collapsed.gff \
+     genes_hs/gencode.v32.annotation.gtf genome_hg38/hg38.fa \
+     --polyA_motif_list PacBio/Sqanti_input/human.polyA.list.txt \
+     --cage_peak PacBio/Sqanti_input/hg38.cage_peak_phase1and2combined_coord.bed \
+     -c PacBio/Sqanti_input/intropolis.v1.hg19_with_liftover_to_hg38.tsv.min_count_10.modified \
+	 --geneid
+	 
+python SQANTI2-master/sqanti_qc2.py -t 30 --gtf scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/Blin_neg.3pass.sort.flnc_BC.merge5.collapsed.gff \
+     genes_hs/gencode.v32.annotation.gtf genome_hg38/hg38.fa \
+     --polyA_motif_list PacBio/Sqanti_input/human.polyA.list.txt \
+     --cage_peak PacBio/Sqanti_input/hg38.cage_peak_phase1and2combined_coord.bed \
+     -c PacBio/Sqanti_input/intropolis.v1.hg19_with_liftover_to_hg38.tsv.min_count_10.modified \
+	 --geneid	 
+
+python SQANTI2-master/sqanti_qc2.py -t 30 --gtf \
+	scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/KPC.3pass.sort.flnc_BC.merge5.collapsed.gff \
+    genes_mm/Mus_musculus.GRCm38.99.chr.gtf genome/Mus_musculus.GRCm38.dna.primary_assembly2.fa \
+    --polyA_motif_list PacBio/Sqanti_input/human.polyA.list.txt \
+    --cage_peak PacBio/Sqanti_input/mm9liftoverGRCm38.cage_peak_phase1and2combined_coord.bed \
+	--geneid
+    
+python SQANTI2-master/sqanti_qc2.py -t 30 --gtf \
+	scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/KPC.3pass.sort.flnc_BC.merge5.collapsed.gff \
+    genes_mm/Mus_musculus.GRCm38.99.chr.gtf genome/Mus_musculus.GRCm38.dna.primary_assembly2.fa \
+    --polyA_motif_list PacBio/Sqanti_input/human.polyA.list.txt \
+    --cage_peak PacBio/Sqanti_input/mm9liftoverGRCm38.cage_peak_phase1and2combined_coord.bed \
+	--geneid
+	 
+	 
+mv 	Alin_neg* scRNA/PacBio/single_cell_pipeline/sqanti_output_3pass_BC
+	 
+############################	 
+8. Filter Artifacts	 
+
+python sqanti_filter2.py \
+     flnc.5merge.collapsed.rep_classification.txt \
+     flnc.5merge.collapsed.rep.renamed.fasta \
+     flnc.5merge.collapsed.rep.fa.sam \
+     flnc.5merge.collapsed.gff
+	 
+python SQANTI2-master/sqanti_filter2.py scRNA/PacBio/single_cell_pipeline/sqanti_output_3pass_BC_new/B_BM_tot.3pass.sort.flnc_BC.merge5.collapsed_classification.txt scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/B_BM_tot.3pass.sort.flnc_BC.merge5.collapsed.rep.fa scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/B_BM_tot.3pass.sort.flnc_BC.merge5.collapsed.gtf
+
+python SQANTI2-master/sqanti_filter2.py \
+				scRNA/PacBio/single_cell_pipeline/sqanti_output_3pass_BC_new/Blin_neg.3pass.sort.flnc_BC.merge5.collapsed_classification.txt \ scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/Blin_neg.3pass.sort.flnc_BC.merge5.collapsed.rep.fa \
+				scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/Blin_neg.3pass.sort.flnc_BC.merge5.collapsed.gff
+
+python SQANTI2-master/sqanti_filter2.py \
+				scRNA/PacBio/single_cell_pipeline/sqanti_output_3pass_BC_new/Alin_neg.3pass.sort.flnc_BC.merge5.collapsed_classification.txt \ scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/Alin_neg.3pass.sort.flnc_BC.merge5.collapsed.rep.fa \
+				scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/Alin_neg.3pass.sort.flnc_BC.merge5.collapsed.gff
+				
+8a. Filter artefacts keep gene names
+
+python SQANTI2-master/sqanti_filter2.py \
+scRNA/PacBio/single_cell_pipeline/sqanti_output_ID/B_BM_tot.3pass.sort.flnc_BC.merge5.collapsed_classification.txt \ scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/B_BM_tot.3pass.sort.flnc_BC.merge5.collapsed.rep.fa \
+scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/B_BM_tot.3pass.sort.flnc_BC.merge5.collapsed.gtf
+
+python SQANTI2-master/sqanti_filter2.py \
+				scRNA/PacBio/single_cell_pipeline/sqanti_output_ID/Blin_neg.3pass.sort.flnc_BC.merge5.collapsed_classification.txt \ scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/Blin_neg.3pass.sort.flnc_BC.merge5.collapsed.rep.fa \
+				scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/Blin_neg.3pass.sort.flnc_BC.merge5.collapsed.gff
+
+python SQANTI2-master/sqanti_filter2.py \
+				scRNA/PacBio/single_cell_pipeline/sqanti_output_ID/Alin_neg.3pass.sort.flnc_BC.merge5.collapsed_classification.txt \ scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/Alin_neg.3pass.sort.flnc_BC.merge5.collapsed.rep.fa \
+				scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/Alin_neg.3pass.sort.flnc_BC.merge5.collapsed.gff
+
+##########################
+9. Process into CSV Report and UMI/BC Error Correction
+
+
+python <path_to>/cDNA_Cupcake/singlecell/collate_FLNC_gene_info.py \
+       flnc.5merge.collapsed.group.txt \
+       my_output.trimmed.csv \
+       flnc.5merge.collapsed.rep_classification.filtered_lite_classification.txt \
+       my_output.trimmed.annotated.csv
+	   
+python cDNA_Cupcake/singlecell/collate_FLNC_gene_info.py \
+       scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/B_BM_tot.3pass.sort.flnc_BC.merge5.collapsed.group.txt \
+       scRNA/PacBio/single_cell_pipeline/trim_3pass_BC/B_BM_tot_10x_BC.trimmed.csv \
+       scRNA/PacBio/single_cell_pipeline/sqanti_output_3pass_BC_new/B_BM_tot.3pass.sort.flnc_BC.merge5.collapsed_classification.filtered_lite_classification.txt \
+       B_BM_tot_10x.trimmed.annotated_filter.csv   
+
+python cDNA_Cupcake/singlecell/collate_FLNC_gene_info.py \
+       scRNA/PacBio/single_cell_pipeline/collapse_3pass_BC/Blin_neg.3pass.sort.flnc_BC.merge5.collapsed.group.txt \
+       scRNA/PacBio/single_cell_pipeline/trim_3pass_BC/Blin_neg_10x_BC.trimmed.csv \
+       scRNA/PacBio/single_cell_pipeline/sqanti_output_3pass_BC_new/Blin_neg.3pass.sort.flnc_BC.merge5.collapsed_classification.filtered_lite_classification.txt \
+       Blin_neg_10x.trimmed_BC.annotated_filter.csv
+
+
+You can then optionally apply a simple error correction to the UMIs and BCs
+and IMPORTANT add info for BC from #3: 
+
+
+		
+ python ~/cDNA_Cupcake/singlecell/UMI_BC_error_correct.py \
+		B_BM_tot_10x.trimmed_BC.annotated.csv \
+		B_BM_tot_10x.trimmed_BC.annotated.corrected.csv \
+		--bc_rank_file B_BM_tot_barcodes_ranked.txt		
+	
+python ~/cDNA_Cupcake/singlecell/UMI_BC_error_correct.py \
+		Blin_neg_10x.trimmed_BC.annotated.csv \
+		Blin_neg_10x.trimmed_BC.annotated.corrected.csv \
+		--bc_rank_file Blin_neg_barcodes.tsv		
+	
+
+		
+python ~/cDNA_Cupcake/singlecell/UMI_BC_error_correct.py \
+		B_BM_tot_10x.trimmed_BC.annotated.csv \
+		B_BM_tot_10x.trimmed_BC.annotated.corrected_S.csv \
+		--bc_rank_file B_BM_tot_BC_clusters_Y.txt		
+		
+# only top ranked:(didn't use)
+	
+python ~/cDNA_Cupcake/singlecell/UMI_BC_error_correct.py \
+        B_BM_tot_10x.trimmed_BC.annotated.csv \
+        B_BM_tot_10x.trimmed_only_BC.annotated.corrected.csv \
+        --bc_rank_file B_BM_tot_barcodes_ranked.txt \
+        --only_top_ranked
+		
+##went to RSeurat to extract BC files for each cluster in the combination short read clustering
+
+python ~/cDNA_Cupcake/singlecell/UMI_BC_error_correct.py \
+		B_BM_tot_10x.trimmed_BC.annotated.csv \
+		B_BM_tot_ranked_BC_clust0.csv \
+		--bc_rank_file BCs_top_ranked/BM_B_combined_BC_clust0_B_tot.txt \
+		--only_top_ranked
+
+python ~/cDNA_Cupcake/singlecell/UMI_BC_error_correct.py \
+		B_BM_tot_10x.trimmed_BC.annotated.csv \
+		B_BM_tot_ranked_BC_clust0.csv \
+		--bc_rank_file BCs_top_ranked/BM_B_combined_BC_clust0_B_tot.txt \
+		--only_top_ranked
+
+
+
