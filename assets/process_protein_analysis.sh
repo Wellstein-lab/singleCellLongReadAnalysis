@@ -50,6 +50,7 @@ grep ">" BM_merged3.sort.flnc_BC.merge5.collapsed.rep.no_random_chr.fa | wc -l
 #*   - star read alignment
 #---------------------------------------------------*/
 #https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L517-L589
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base STAR --runThreadN 4 --runMode genomeGenerate --genomeDir "/Users/annedeslattesmays/projects/singleCellLongReadAnalysis/data/star_genome" --genomeFastaFiles "/Users/annedeslattesmays/projects/singleCellLongReadAnalysis/data/GRCh38.primary_assembly.genome.fa" --sjdbGTFfile "/Users/annedeslattesmays/projects/singleCellLongReadAnalysis/data/gencode.v38.primary_assembly.annotation.gtf" --genomeSAindexNbases 11 --limitGenomeGenerateRAM 8369034848
 
 #And then sqanti3
 #/*--------------------------------------------------
