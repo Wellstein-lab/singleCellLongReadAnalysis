@@ -20,6 +20,133 @@
 # available are run with the same pattern - this is how to run sqanti3_qc.py
 #
 #
+# begin here inside terminal windows (laptop or jupyterlab terminal windows
+#
+conda init bash
+exec -l bash
+conda create -n sclrp -y
+conda activate sclrp
+#
+# command line GitHub
+#
+conda install -c conda-forge gh -y
+#
+# ignore certificate error
+#
+git config --global http.sslVerify false
+#
+# login to your GitHub
+#
+gh auth login
+#
+# didn't work so lets jump to docker
+#
+curl --verbose https://live.cardeasexml.com/ultradns.php
+# returned this:
+#*   Trying 91.197.93.250:443...
+#* TCP_NODELAY set
+#* Connected to live.cardeasexml.com (91.197.93.250) port 443 (#0)
+#* ALPN, offering http/1.1
+#* successfully set certificate verify locations:
+#*   CAfile: /opt/conda/ssl/cacert.pem
+#  CApath: none
+#* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+#* TLSv1.3 (IN), TLS handshake, Server hello (2):
+#* TLSv1.2 (IN), TLS handshake, Certificate (11):
+#* TLSv1.2 (IN), TLS handshake, Server finished (14):
+#* TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
+#* TLSv1.2 (OUT), TLS change cipher, Change cipher spec (1):
+#* TLSv1.2 (OUT), TLS handshake, Finished (20):
+#* TLSv1.2 (IN), TLS handshake, Finished (20):
+#* SSL connection using TLSv1.2 / AES256-GCM-SHA384
+#* ALPN, server did not agree to a protocol
+#* Server certificate:
+#*  subject: C=GB; L=Bristol; O=Creditcall Ltd; CN=live.cardeasexml.com
+#*  start date: Aug  5 00:00:00 2020 GMT
+#*  expire date: Aug 10 12:00:00 2022 GMT
+#*  subjectAltName: host "live.cardeasexml.com" matched cert's "live.cardeasexml.com"
+#*  issuer: C=US; O=DigiCert Inc; OU=www.digicert.com; CN=Thawte TLS RSA CA G1
+#*  SSL certificate verify ok.
+#> GET /ultradns.php HTTP/1.1
+#> Host: live.cardeasexml.com
+#> User-Agent: curl/7.68.0
+#> Accept: */*
+#> 
+#* Mark bundle as not supporting multiuse
+#* HTTP 1.0, assume close after body
+#< HTTP/1.0 200 OK
+#< Content-Type: text/html
+#< Cache-Control: no-cache, no-store, must-revalidate
+#< Pragma: no-cache
+#< Expires: 0
+#< Connection: close
+#< Content-Length: 7
+#< 
+#* Closing connection 0
+#* TLSv1.2 (OUT), TLS alert, close notify (256):
+#
+# So we have a trusted certificate.
+# I have the certificate location :point_right:  CAfile: /opt/conda/ssl/cacert.pem
+# and I know the port number. live.cardeasexml.com (91.197.93.250) port 443
+#
+sudo cp /opt/conda/ssl/cacert.pem /usr/local/share/ca-certificates/
+sudo update-ca-certificates
+#
+# I get an error
+#
+sudo update-ca-certificates
+#/usr/sbin/update-ca-certificates: 114: cd: can't cd to /etc/ssl/certs
+#
+# so investigate
+#
+ls -l /etc/ssl/certs
+#
+# lrwxrwxrwx 1 root root 16 Oct 23 16:10 /etc/ssl/certs -> ../pki/tls/certs
+# doesn't enxist is red
+#
+sudo rm /etc/ssl/certs
+sudo mkdir /etc/ssl/certs
+#
+# re-run the update-ca-certificates
+#
+sudo update-ca-certificates
+#
+# which is successful
+#
+# Updating certificates in /etc/ssl/certs...
+# 127 added, 0 removed; done.
+# Running hooks in /etc/ca-certificates/update.d...
+# done.
+#
+# restart docker
+#
+sudo service docker restart
+#
+# gh auth login
+#
+gh auth login
+#
+# this permitted me to also login with GitHub
+#
+#? What account do you want to log into? GitHub.com
+#? What is your preferred protocol for Git operations? HTTPS
+#? Authenticate Git with your GitHub credentials? Yes
+#? How would you like to authenticate GitHub CLI? Paste an authentication token
+#Tip: you can generate a Personal Access Token here https://github.com/settings/tokens
+#The minimum required scopes are 'repo', 'read:org', 'workflow'.
+#? Paste your authentication token: ****************************************
+#- gh config set -h github.com git_protocol https
+#✓ Configured git protocol
+#✓ Logged in as adeslatt
+#
+
+#
+# awscli install
+#
+conda install -c conda-forge awscli -y
+#
+# 
+#
 #  Get the fasta and the gtf files
 wget http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_38/GRCh38.primary_assembly.genome.fa.gz
 wget http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_38/gencode.v38.primary_assembly.annotation.gtf.gz
@@ -30,7 +157,13 @@ grep ">" BM_merged3.sort.flnc_BC.merge5.collapsed.rep.fa | wc -l
 #213099
 grep ">" BM_merged3.sort.flnc_BC.merge5.collapsed.rep.no_random_chr.fa | wc -l
 #212845
-
+#
+# getting around problems with regards to security certificates with cloning GitHub repositories
+#
+#
+# getting around problems with regards to docker image/container registries use through jupyterlab notebooks
+#
+curl --verbose https://live.cardeasexml.com/ultradns.php
 #
 #----------------------------------------------------------
 #
@@ -50,7 +183,10 @@ grep ">" BM_merged3.sort.flnc_BC.merge5.collapsed.rep.no_random_chr.fa | wc -l
 #*   - star read alignment
 #---------------------------------------------------*/
 #https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L517-L589
-docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base STAR --runThreadN 4 --runMode genomeGenerate --genomeDir "/Users/annedeslattesmays/projects/singleCellLongReadAnalysis/data/star_genome" --genomeFastaFiles "/Users/annedeslattesmays/projects/singleCellLongReadAnalysis/data/GRCh38.primary_assembly.genome.fa" --sjdbGTFfile "/Users/annedeslattesmays/projects/singleCellLongReadAnalysis/data/gencode.v38.primary_assembly.annotation.gtf" --genomeSAindexNbases 11 --limitGenomeGenerateRAM 8369034848
+# run on a dedicated instance within cloudOS 8 vCPUs 61 GB RAM, 1000 GB
+#TODO: put into a nextflow script rather than command line running of a container
+#NICETOHAVE: make a container just for STAR rather than using the entire proteogenomics-base
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base STAR --runThreadN 8 --runMode genomeGenerate --genomeDir star_genome --genomeFastaFiles GRCh38.primary_assembly.genome.fa --sjdbGTFfile gencode.v32.primary_assembly.annotation.gtf --genomeSAindexNbases 11 --limitGenomeGenerateRAM 66952278784
 
 #And then sqanti3
 #/*--------------------------------------------------
