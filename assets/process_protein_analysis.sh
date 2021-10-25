@@ -139,6 +139,34 @@ gh auth login
 #✓ Configured git protocol
 #✓ Logged in as adeslatt
 #
+git add assets/process_protein_analysis.sh
+git commit -m "added security login steps"
+#
+#*** Please tell me who you are.
+#
+#Run#
+#
+#  git config --global user.email "you@example.com"
+#  git config --global user.name "Your Name"#
+#
+#to set your account's default identity.
+#Omit --global to set the identity only in this repository.
+#
+git config --global user.email "adeslat@scitechcon.org"
+git config --global user.name "adeslatt"
+#
+# git push
+#
+git push
+#
+# returns: Counting objects: 4, done.
+# Delta compression using up to 8 threads.
+#Compressing objects: 100% (4/4), done.
+#Writing objects: 100% (4/4), 2.35 KiB | 2.35 MiB/s, done.
+#Total 4 (delta 3), reused 0 (delta 0)
+#remote: Resolving deltas: 100% (3/3), completed with 3 local objects.
+#To https://github.com/Wellstein-lab/singleCellLongReadAnalysis.git
+#   6e25e5a..e7ac276  main -> main
 
 #
 # awscli install
@@ -164,6 +192,23 @@ grep ">" BM_merged3.sort.flnc_BC.merge5.collapsed.rep.no_random_chr.fa | wc -l
 # getting around problems with regards to docker image/container registries use through jupyterlab notebooks
 #
 curl --verbose https://live.cardeasexml.com/ultradns.php
+
+#----------------------------------------------------------
+#
+# Generate reference tables
+#
+# using two input files Protein-coding transcript sequences -
+#  which are the nucleotide sequences of coding transcripts on the reference chromosomes.
+#  Transcript biotypes: protein_coding, nonsense_mediated_decay, non_stop_decay, IG_*_gen,
+#  TR*_gene, polymorphic_pseudogene
+#
+# using container gsheynkmanlab/generate-reference-tables
+#
+#----------------------------------------------------------
+
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/generate-reference-tables prepare_reference_tables.py --gtf gencode.v32.primary_assembly.annotation.gtf --fa gencode.v32.pc_transcripts.fa --ensg_gene ensg_gene.tsv --enst_isoname enst_isoname.tsv --gene_ensp gene_ensp.tsv --gene_isoname gene_isoname.tsv --isoname_lens isoname_lens.tsv --gene_lens gene_lens.tsv --protein_coding_genes protein_coding_genes.txt
+
+
 #
 #----------------------------------------------------------
 #
@@ -197,126 +242,209 @@ docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base STAR 
 #* genome
 #---------------------------------------------------*/
 #https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L591-L653
-docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/sqanti3 sqanti3_qc.py BM_merged3.sort.flnc_BC.merge5.collapsed.no_random.no_alt.no_chrUn.gff gencode.v38.primary_assembly.annotation.gtf GRCh38.primary_assembly.genome.fa --skipORF -o human_bone_marrow --fl_count BM_merged3.sort.flnc_BC.merge5.collapsed.abundance.txt --gtf -c 100
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/sqanti3 sqanti3_qc.py BM_merged3.sort.flnc_BC.merge5.collapsed.no_random.no_alt.no_chrUn.gff gencode.v32.primary_assembly.annotation.gtf GRCh38.primary_assembly.genome.fa --skipORF -o human_bone_marrow --fl_count BM_merged3.sort.flnc_BC.merge5.collapsed.abundance.txt --gtf -c 100
 
 
 
+#Then I will filter sqanti3 (we can adjust these criteria if we find it over restrictive)
+#/*--------------------------------------------------
+#Filter SQANTI
+#* Filter SQANTI results based on several criteria
+#* - protein coding only
+#*      PB transcript aligns to a GENCODE-annotated protein coding gene.
+#* - percent A downstream
+#*      perc_A_downstreamTTS : percent of genomic "A"s in the downstream 20 bp window.
+# *      If this number if high (> 80%), the 3' end have arisen from intra-priming during the RT step 
+# * - RTS stage
+# *      RTS_stage: TRUE if one of the junctions could be an RT template switching artifact.
+# * - Structural Category
+# *      keep only transcripts that have a isoform structural category of:
+# *        -novel_not_in_catalog
+# *        -novel_in_catalog
+# *        -incomplete-splice_match
+# *        -full-splice_match 
+#---------------------------------------------------*/
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e37#0/main.nf#L655-L731
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base filter_sqanti.py --sqanti_classification human_bone_marrow_classification.txt --sqanti_corrected_fasta human_bone_marrow_corrected.fasta --sqanti_corrected_gtf human_bone_marrow_corrected.gtf --protein_coding_genes protein_coding_genes.txt --ensg_gene ensg_gene.tsv --filter_protein_coding yes --filter_intra_polyA yes --filter_template_switching yes --percent_A_downstream_threshold 95 --structural_categories_level strict --minimum_illumina_coverage 3
 
-Then I will filter sqanti3 (we can adjust these criteria if we find it over restrictive)
-/*--------------------------------------------------
-Filter SQANTI
-* Filter SQANTI results based on several criteria
-* - protein coding only
-*      PB transcript aligns to a GENCODE-annotated protein coding gene.
-* - percent A downstream
-*      perc_A_downstreamTTS : percent of genomic "A"s in the downstream 20 bp window.
- *      If this number if high (> 80%), the 3' end have arisen from intra-priming during the RT step 
- * - RTS stage
- *      RTS_stage: TRUE if one of the junctions could be an RT template switching artifact.
- * - Structural Category
- *      keep only transcripts that have a isoform structural category of:
- *        -novel_not_in_catalog
- *        -novel_in_catalog
- *        -incomplete-splice_match
- *        -full-splice_match 
----------------------------------------------------*/
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L655-L731
+#
+# collapse_isoforms
+#
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base collapse_isoforms.py --name human_bone_marrow --sqanti_gtf filtered_human_bone_marrow_corrected.gtf --sqanti_fasta filtered_human_bone_marrow_corrected.fasta
 
-
-Then 6frame translation:
-/*--------------------------------------------------
-Six-Frame Translation
- * Generates a fasta file of all possible protein sequences
- * derivable from each PacBio transcript, by translating the
- * fasta file in all six frames (3+, 3-). This is used to examine
- * what peptides could theoretically match the peptides found via
- * a mass spectrometry search against GENCODE.  — we may not do this :)
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L734-L763
-
-Then make a Transcriptome Summary (how could we run the Single cell code through this?  I am assuming we have bulk RNA seq — I think we have both yes?
-/*--------------------------------------------------
-Transcriptome Summary
- * Compares the abundance (CPM) based on long-read sequencing
- * to the abundances (TPM) inferred from short-read sequencing,
- * as computed by Kallisto (analyzed outside of this pipeline).
- * Additionally produces a pacbio-gene reference table
----------------------------------------------------*/
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L766-L800
-
-Then we run CPAT
-/*--------------------------------------------------
-CPAT
- * CPAT is a bioinformatics tool to predict an RNA’s coding probability 
- * based on the RNA sequence characteristics. 
- * To achieve this goal, CPAT calculates scores of sequence-based features 
- * from a set of known protein-coding genes and background set of non-coding genes.
- *     ORF size
- *     ORF coverage
- *     Fickett score
- *     Hexamer usage bias
- * 
- * CPAT will then builds a logistic regression model using these 4 features as 
- * predictor variables and the “protein-coding status” as the response variable. 
- * After evaluating the performance and determining the probability cutoff, 
- * the model can be used to predict new RNA sequences.
- *
- * https://cpat.readthedocs.io/en/latest/
----------------------------------------------------*/
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L810-L867
-
-Then we select the most plausible ORF
-/*--------------------------------------------------
-ORF Calling 
- * Selects the most plausible ORF from each pacbio transcript,
- * using the following information
- *    comparison of ATG start to reference (GENCODE) 
- *        - selects ORF with ATG start matching the one in the reference, if it exists 
- *    coding probability score from CPAT
- *    number of upstream ATGs for the candidate ORF
- *        - decrease score as number of upstream ATGs increases 
- *         using sigmoid function
- *  Additionally provides calling confidence of each ORF called
- *      - Clear Best ORF  : best score and fewest upstream ATGs of all called ORFs
- *      - Plausible ORF   : not clear best, but decent CPAT coding_score (>0.364) 
- *      - Low Quality ORF : low CPAT coding_score (<0.364)       
----------------------------------------------------*/
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L869-L920
+#
+# collapse_classifications
+#
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base collapse_classification.py --name human_bone_marrow --collapsed_fasta human_bone_marrow_corrected.5degfilter.fasta --classification filtered_human_bone_marrow_classification.tsv
 
 
-Then we make a refined database (even though we do not have mass spec data - because it does some collapsing of the transcripts into the shared proteins (or ORFs).
-/*--------------------------------------------------
-Refined DB Generation
- * - Filteres ORF database to only include accessions 
- *   with a CPAT coding score above a threshold (default 0.0)
- * - Filters ORFs to only include ORFs that have a stop codon 
- * - Collapses transcripts that produce the same protein
- *   into one entry, keeping a base accession (first alphanumeric).
- *   Abundances of transcripts (CPM) are collapsed during this process.
----------------------------------------------------*/
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L923-L962
+#Then 6frame translation:
+#/*--------------------------------------------------
+#Six-Frame Translation
+# * Generates a fasta file of all possible protein sequences
+# * derivable from each PacBio transcript, by translating the
+# * fasta file in all six frames (3+, 3-). This is used to examine
+# * what peptides could theoretically match the peptides found via
+# * a mass spectrometry search against GENCODE.  — we may not do this :)
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L734-L763
+#
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base six_frame_translation.py --iso_annot human_bone_marrow_classification.5degfilter.tsv --ensg_gene ensg_gene.tsv --sample_fasta human_bone_marrow_corrected.5degfilter.fasta
+#
+# this failed so I found and forked six_frame_translation.py
+# here
+# https://github.com/chinmayaNK22/Proteogenomic-Pipeline
+#
+# I copied the Standard_Codon.txt to the data directory so it could be found.
+# output human_bone_marrow_corrected.5degfilter_sixframe.fasta
+#
+python ../../Proteogenomic-Pipeline/six_frame_translation.py human_bone_marrow_corrected.5degfilter.fasta 
 
-Then we do some clean up with the CDS GTF
-/*--------------------------------------------------
-PacBio CDS GTF 
- * derive a GTF file that includes the ORF regions (as CDS features)
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L966-L1008
+#Then make a Transcriptome Summary (how could we run the Single cell code through this?  I am assuming we have bulk RNA seq — I think we have both yes?
+#/*--------------------------------------------------
+#Transcriptome Summary
+# * Compares the abundance (CPM) based on long-read sequencing
+# * to the abundances (TPM) inferred from short-read sequencing,
+# * as computed by Kallisto (analyzed outside of this pipeline).
+# * Additionally produces a pacbio-gene reference table
+#---------------------------------------------------*/
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L766-L800
+#
+# Install Kallisto
+conda install kallisto -y
+kallisto index -i gencode.v32.pc_transcripts.idx gencode.v32.pc_transcripts.fa 
 
-An additional pre-processing step before running SQANTI PROTEIN
-/*--------------------------------------------------
-Rename CDS to Exon
- * Preprocessing step to SQANTI Protein
- * CDS is renamed to exon and transcript stop and start
- * locations are updated to reflect CDS start and stop
----------------------------------------------------*/
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1010-L1039
+kallisto quant --index=gencode.v32.pc_transcripts.idx --threads=8 --plaintext Alin_neg_S2_L008_R1_001.fastq.gz Alin_neg_S2_L008_R2_001.fastq.gz --output-dir=Alin_neg_bulk_RNA_kallisto
 
-Now we run SQANTI Protein
-/*--------------------------------------------------
-SQANTI Protein
- * Classify protein splice sites and calculates additional
- * statistics for start and stop of ORF
----------------------------------------------------*/
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1040-L1066
+kallisto quant --index=gencode.v32.pc_transcripts.idx --threads=8 --plaintext Blin_neg_S4_L008_R1_001.fastq.gz Blin_neg_S4_L008_R2_001.fastq.gz --output-dir=Blin_neg_bulk_RNA_kallisto
+
+kallisto quant --index=gencode.v32.pc_transcripts.idx --threads=8 --plaintext B_BM_tot_S3_L008_R1_001.fastq.gz B_BM_tot_S3_L008_R2_001.fastq.gz --output-dir=BM_tot_bulk_RNA_kallisto
+#
+# then merge all the outputs together used method here
+#    https://pmbio.org/module-06-rnaseq/0006/05/01/Reference_Free_Kallisto/
+#
+paste */abundance.tsv | cut -f 1,2,5,10,15,20 > transcript_tpms_all_samples.tsv
+ls -1 */abundance.tsv | perl -ne 'chomp $_; if ($_ =~ /(\S+)\/abundance\.tsv/){print "\t$1"}' | perl -ne 'print "target_id\tlength$_\n"' > header.tsv
+cat header.tsv transcript_tpms_all_samples.tsv | grep -v "tpm" > transcript_tpms_all_samples.tsv2
+mv transcript_tpms_all_samples.tsv2 transcript_tpms_all_samples.tsv
+rm -f header.tsv
+
+#
+# now run transcriptome summary
+#
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base transcriptome_summary.py --sq_out human_bone_marrow_classification.5degfilter.tsv --tpm Blin_neg_bulk_RNA_kallisto/abundance.tsv --ensg_to_gene ensg_gene.tsv --enst_to_isoname enst_isoname.tsv --len_stats gene_lens.tsv
+
+#
+# I get the file I was looking for, pb_gene.tsv, but I do have an error
+# Isoform Table from sqanti output has been prepared
+#Traceback (most recent call last):
+#  File "/opt/bin/transcriptome_summary.py", line 137, in <module>
+#    main()
+#  File "/opt/bin/transcriptome_summary.py", line 116, in main
+#    ab_tab = abund(sq_isotab, results.tpm_file)
+#  File "/opt/bin/transcriptome_summary.py", line 81, in abund
+#    ab = pd.merge(cpm_by_gene, tpm_by_gene, how='right', on='gene')
+#  File "/opt/conda/envs/proteogenomics-base/lib/python3.7/site-packages/pandas/core/reshape/merge.p#y", line 87, in merge
+#    validate=validate,
+#  File "/opt/conda/envs/proteogenomics-base/lib/python3.7/site-packages/pandas/core/reshape/merge.p#y", line 668, in __init__
+#    ) = self._get_merge_keys()
+#  File "/opt/conda/envs/proteogenomics-base/lib/python3.7/site-packages/pandas/core/reshape/merge.p#y", line 1033, in _get_merge_keys
+#    right_keys.append(right._get_label_or_level_values(rk))
+#  File "/opt/conda/envs/proteogenomics-base/lib/python3.7/site-packages/pandas/core/generic.py", li#ne 1684, in _get_label_or_level_values
+#    raise KeyError(key)
+#    KeyError: 'gene'
+
+
+#Then we run CPAT
+#/*--------------------------------------------------
+#CPAT
+# * CPAT is a bioinformatics tool to predict an RNA’s coding probability 
+# * based on the RNA sequence characteristics. 
+# * To achieve this goal, CPAT calculates scores of sequence-based features 
+# * from a set of known protein-coding genes and background set of non-coding genes.
+# *     ORF size
+# *     ORF coverage
+# *     Fickett score
+# *     Hexamer usage bias
+# * 
+# * CPAT will then builds a logistic regression model using these 4 features as 
+# * predictor variables and the “protein-coding status” as the response variable. 
+# * After evaluating the performance and determining the probability cutoff, 
+# * the model can be used to predict new RNA sequences.
+# *
+# * https://cpat.readthedocs.io/en/latest/
+#---------------------------------------------------*/
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L810-L867
+#
+# get the Human hexamer and logit models needed by cpat
+#
+
+wget https://zenodo.org/record/5076056/files/Human_Hexamer.tsv 
+wget https://zenodo.org/record/5076056/files/Human_logitModel.RData.gz
+
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/cpat:addr cpat.py -x Human_Hexamer.tsv -d Human_logitModel.RData -g human_bone_marrow_corrected.5degfilter.fasta --min-orf=50 --top-orf=50 -o human_bone_marrow 1>human_bone_marrow_cpat.output 2>human_bone_marrow_cpat.error
+
+
+#Then we select the most plausible ORF
+#/*--------------------------------------------------
+#ORF Calling 
+# * Selects the most plausible ORF from each pacbio transcript,
+# * using the following information
+# *    comparison of ATG start to reference (GENCODE) 
+# *        - selects ORF with ATG start matching the one in the reference, if it exists 
+# *    coding probability score from CPAT
+# *    number of upstream ATGs for the candidate ORF
+# *        - decrease score as number of upstream ATGs increases 
+# *         using sigmoid function
+# *  Additionally provides calling confidence of each ORF called
+# *      - Clear Best ORF  : best score and fewest upstream ATGs of all called ORFs
+# *      - Plausible ORF   : not clear best, but decent CPAT coding_score (>0.364) 
+# *      - Low Quality ORF : low CPAT coding_score (<0.364)       
+#---------------------------------------------------*/
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L869-L920
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base orf_calling.py --orf_coord human_bone_marrow.ORF_prob.tsv --orf_fasta human_bone_marrow.ORF_seqs.fa --gencode gencode.v32.primary_assembly.annotation.gtf --sample_gtf human_bone_marrow_corrected.gtf --pb_gene pb_gene.tsv --classification human_bone_marrow_classification.5degfilter.tsv --sample_fasta human_bone_marrow_corrected.5degfilter.fasta --num_cores 8 --output human_bone_marrow_best_orf.tsv
+
+
+#Then we make a refined database (even though we do not have mass spec data - because it does some collapsing of the transcripts into the shared proteins (or ORFs).
+#/*--------------------------------------------------
+#Refined DB Generation
+# * - Filteres ORF database to only include accessions 
+# *   with a CPAT coding score above a threshold (default 0.0)
+# * - Filters ORFs to only include ORFs that have a stop codon 
+# * - Collapses transcripts that produce the same protein
+# *   into one entry, keeping a base accession (first alphanumeric).
+# *   Abundances of transcripts (CPM) are collapsed during this process.
+#---------------------------------------------------*/
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L923-L962
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base refine_orf_database.py --name human_bone_marrow --orfs human_bone_marrow_best_orf.tsv --pb_fasta human_bone_marrow_corrected.5degfilter.fasta --coding_score_cutoff 0.364
+
+
+#Then we do some clean up with the CDS GTF
+#/*--------------------------------------------------
+#PacBio CDS GTF 
+# * derive a GTF file that includes the ORF regions (as CDS features)
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L966-L1008
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base make_pacbio_cds_gtf.py --name human_bone_marrow --sample_gtf human_bone_marrow_corrected.gtf --refined_database human_bone_marrow_orf_refined.tsv --called_orfs human_bone_marrow_best_orf.tsv --pb_gene pb_gene.tsv --include_transcript yes
+
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base make_pacbio_cds_gtf.py --name human_bone_marrow_no_transcript --sample_gtf human_bone_marrow_corrected.gtf --refined_database human_bone_marrow_orf_refined.tsv --called_orfs human_bone_marrow_best_orf.tsv --pb_gene pb_gene.tsv --include_transcript no
+
+#An additional pre-processing step before running SQANTI PROTEIN
+#/*--------------------------------------------------
+#Rename CDS to Exon
+# * Preprocessing step to SQANTI Protein
+# * CDS is renamed to exon and transcript stop and start
+# * locations are updated to reflect CDS start and stop
+#---------------------------------------------------*/
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1010-L1039
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base rename_cds_to_exon.py --sample_gtf human_bone_marrow_with_cds.gtf --reference_gtf gencode.v32.primary_assembly.annotation.gtf --reference_name gencode --num_cores 8
+
+#Now we run SQANTI Protein
+#/*--------------------------------------------------
+#SQANTI Protein
+# * Classify protein splice sites and calculates additional
+# * statistics for start and stop of ORF
+#---------------------------------------------------*/
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1040-L1066
+
 
 One more intermediate step before fully classifying protein:
 /*--------------------------------------------------
@@ -395,15 +523,3 @@ Protein Track Visualization
 https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1627-L1691
 
 
-Any way — give me a call and lets talk through this — 
-~
-#----------------------------------------------------------
-#
-# Get the latest Human Assembly from gencode
-#
-#----------------------------------------------------------
-wget http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_38/GRCh38.primary_assembly.genome.fa.gz
-#----------------------------------------------------------
-#
-# Make the indices (Alex Dobbin recommends users build their own indices)
-#
