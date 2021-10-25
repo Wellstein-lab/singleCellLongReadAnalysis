@@ -620,3 +620,20 @@ docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base \
  track_add_rgb_colors_to_bed.py \
     --name human_bone_marrow_hybrid \
     --bed_file human_bone_marrow_hybrid_cds.bed12
+
+
+#
+# make multiregion refined
+#
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base make_region_bed_for_ucsc.py --name human_bone_marrow_refined --sample_gtf human_bone_marrow_with_cds_refined.gtf --reference_gtf gencode.v32.primary_assembly.annotation.gtf
+
+#
+# make multiregion filtered
+#
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base make_region_bed_for_ucsc.py --name human_bone_marrow_filtered --sample_gtf human_bone_marrow_with_cds_filtered.gtf --reference_gtf gencode.v32.primary_assembly.annotation.gtf
+
+#
+# make multiregion bed high_confidence
+#
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base make_region_bed_for_ucsc.py --name human_bone_marrow_high_confidence --sample_gtf human_bone_marrow_cds_high_confidence.gtf --reference_gtf gencode.v32.primary_assembly.annotation.gtf
+
