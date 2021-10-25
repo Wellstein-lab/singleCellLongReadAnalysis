@@ -1,4 +1,4 @@
-#!/bin/bash
+<#!/bin/bash
 #----------------------------------------------------------
 # Sunday October 17, 2021
 #----------------------------------------------------------
@@ -208,6 +208,7 @@ curl --verbose https://live.cardeasexml.com/ultradns.php
 
 docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/generate-reference-tables prepare_reference_tables.py --gtf gencode.v32.primary_assembly.annotation.gtf --fa gencode.v32.pc_transcripts.fa --ensg_gene ensg_gene.tsv --enst_isoname enst_isoname.tsv --gene_ensp gene_ensp.tsv --gene_isoname gene_isoname.tsv --isoname_lens isoname_lens.tsv --gene_lens gene_lens.tsv --protein_coding_genes protein_coding_genes.txt
 
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base make_gencode_database.py   --gencode_fasta gencode.v32.pc_translations.fa   --protein_coding_genes protein_coding_genes.txt   --output_fasta gencode_protein.fasta   --output_cluster gencode_isoname_clusters.tsv
 
 #
 #----------------------------------------------------------
@@ -435,6 +436,9 @@ docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base make_
 # * locations are updated to reflect CDS start and stop
 #---------------------------------------------------*/
 #https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1010-L1039
+#
+# I didn't supply a name (I didn't know how to) so the output got put to None
+#
 docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base rename_cds_to_exon.py --sample_gtf human_bone_marrow_with_cds.gtf --reference_gtf gencode.v32.primary_assembly.annotation.gtf --reference_name gencode --num_cores 8
 
 #Now we run SQANTI Protein
@@ -445,81 +449,174 @@ docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base renam
 #---------------------------------------------------*/
 #https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1040-L1066
 
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/sqanti_protein:sing sqanti3_protein.py human_bone_marrow.transcript_exons_only.gtf human_bone_marrow.cds_renamed_exon.gtf human_bone_marrow_best_orf.tsv gencode.cds_renamed_exon.gtf gencode.transcript_exons_only.gtf -d ./ -p human_bone_marrow
 
-One more intermediate step before fully classifying protein:
-/*--------------------------------------------------
-5' UTR Status
- * Intermediate step for protein classification
-  * Dtermines the 5' UTR status of the protein in order 
- * to classify protein category in latter step
----------------------------------------------------*/
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1069-L1102
+#One more intermediate step before fully classifying protein:
+#/*--------------------------------------------------
+#5' UTR Status
+# * Intermediate step for protein classification
+#  * Dtermines the 5' UTR status of the protein in order 
+# * to classify protein category in latter step
+#---------------------------------------------------*/
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1069-L1102
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base 1_get_gc_exon_and_5utr_info.py --gencode_gtf gencode.v32.primary_assembly.annotation.gtf --odir ./
 
-Now we get to Protein Classification
-/*--------------------------------------------------
-Protein Classification
- * Classifies protein based on splicing and start site
- * main classifications are 
- *   pFSM: full-protein-match
- *     - protein fully matches a gencode protein
- *   pISM: incomplete-protein-match
- *     - protein only partially matches gencode protein
- *     - considered an N- or C-terminus truncation artifact
- *   pNIC: novel-in-catelog
- *     - protein composed of known N-term, splicing, and/or C-term in new combinations
- *   pNNC: novel-not-in-catelog
- *     - protein composed of novel N-term, splicing, and/or C-terminus
----------------------------------------------------*/
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1104-L1150
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base 2_classify_5utr_status.py --gencode_exons_bed gencode_exons_for_cds_containing_ensts.bed --gencode_exons_chain gc_exon_chain_strings_for_cds_containing_transcripts.tsv --sample_cds_gtf human_bone_marrow_with_cds.gtf --odir ./
 
-More clean up - Protein Gene Rename
-/*--------------------------------------------------
-Protein Gene Rename
- * Mapings of PacBio transcripts/proteins to GENCODE genes.
- * Some PacBio transcripts and the associated PacBio
- * predicted protein can map two different genes.
- * Some transcripts can also map to multiple genes.
----------------------------------------------------*/
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1152-L1195
-
-Some protein filtering
-/*--------------------------------------------------
-Protein Filtering
- * Filters out proteins that are:
- *  - not pFSM, pNIC, pNNC
- *  - are pISMs (either N-terminus or C-terminus truncations)
- *  - pNNC with junctions after the stop codon (default 2)  
----------------------------------------------------*/
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1197-L1235
-
-Now we get a hybrid database - which we could also use for visualisation through the UCSC browser
-/*--------------------------------------------------
-Protein Hybrid Database
- * Makes a hybrid database that is composed of 
- * high-confidence PacBio proteins and GENCODE proteins
- * for genes that are not in the high-confidence space
- * High-confidence is defined as genes in which the PacBio
- * sampling is adequate (average transcript length 1-4kb
- * and a total of 3 CPM per gene
----------------------------------------------------*/
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1237-L1287
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base 3_merge_5utr_info_to_pclass_table.py --name human_bone_marrow  --utr_info pb_5utr_categories.tsv --sqanti_protein_classification human_bone_marrow.sqanti_protein_classification.tsv --odir ./ 
 
 
-Finally, I think we can use this - even though it says compare the MS results - there isn’t as far as I can see any MS results but a comparison of the various ORF, Peptide and filtered results
-/*--------------------------------------------------
-Peptide Analysis
- * Generate a table comparing MS peptide results
- * between the PacBio and GENCODE databases. 
----------------------------------------------------*/
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1562-L1594
+#Now we get to Protein Classification
+#/*--------------------------------------------------
+#Protein Classification
+# * Classifies protein based on splicing and start site
+# * main classifications are 
+# *   pFSM: full-protein-match
+# *     - protein fully matches a gencode protein
+# *   pISM: incomplete-protein-match
+# *     - protein only partially matches gencode protein
+# *     - considered an N- or C-terminus truncation artifact
+# *   pNIC: novel-in-catelog
+# *     - protein composed of known N-term, splicing, and/or C-term in new combinations
+# *   pNNC: novel-not-in-catelog
+# *     - protein composed of novel N-term, splicing, and/or C-terminus
+#---------------------------------------------------*/
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1104-L1150
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base \
+    protein_classification_add_meta.py \
+    --protein_classification human_bone_marrow.sqanti_protein_classification_w_5utr_info.tsv \
+    --best_orf human_bone_marrow_best_orf.tsv \
+    --refined_meta human_bone_marrow_orf_refined.tsv \
+    --ensg_gene ensg_gene.tsv \
+    --name human_bone_marrow \
+    --dest_dir ./
 
-But Finally Finally - I think we can similarly visualise these results using this routine:
-/*--------------------------------------------------
-Protein Track Visualization
- * Creates tracks to use in UCSC Genome Browser for 
- * refined, filtered, and hybrid PacBio databases.
- * Shades tracks based on abundance (CPMs) and protein classification.
----------------------------------------------------*/
-https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1627-L1691
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base \
+    protein_classification.py \
+    --sqanti_protein human_bone_marrow.protein_classification_w_meta.tsv \
+    --name human_bone_marrow_unfiltered \
+    --dest_dir ./
 
+#More clean up - Protein Gene Rename
+#/*--------------------------------------------------
+#Protein Gene Rename
+# * Mapings of PacBio transcripts/proteins to GENCODE genes.
+# * Some PacBio transcripts and the associated PacBio
+# * predicted protein can map two different genes.
+# * Some transcripts can also map to multiple genes.
+#---------------------------------------------------*/
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1152-L1195
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base \
+    protein_gene_rename.py \
+    --sample_gtf human_bone_marrow_with_cds.gtf \
+    --sample_protein_fasta human_bone_marrow_orf_refined.fasta \
+    --sample_refined_info human_bone_marrow_orf_refined.tsv \
+    --pb_protein_genes human_bone_marrow_genes.tsv \
+    --name human_bone_marrow
 
+#Some protein filtering
+#/*--------------------------------------------------
+#Protein Filtering
+# * Filters out proteins that are:
+# *  - not pFSM, pNIC, pNNC
+# *  - are pISMs (either N-terminus or C-terminus truncations)
+# *  - pNNC with junctions after the stop codon (default 2)  
+#---------------------------------------------------*/
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1197-L1235
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base \
+  protein_filter.py \
+    --protein_classification human_bone_marrow_unfiltered.protein_classification.tsv \
+    --gencode_gtf gencode.v32.primary_assembly.annotation.gtf \
+    --protein_fasta human_bone_marrow.protein_refined.fasta \
+    --sample_cds_gtf human_bone_marrow_with_cds_refined.gtf \
+    --min_junctions_after_stop_codon 2 \
+    --name human_bone_marrow
+
+#Now we get a hybrid database - which we could also use for visualisation through the UCSC browser
+#/*--------------------------------------------------
+#Protein Hybrid Database
+# * Makes a hybrid database that is composed of 
+# * high-confidence PacBio proteins and GENCODE proteins
+# * for genes that are not in the high-confidence space
+# * High-confidence is defined as genes in which the PacBio
+# * sampling is adequate (average transcript length 1-4kb
+# * and a total of 3 CPM per gene
+#---------------------------------------------------*/
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1237-L1287
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base \
+    make_hybrid_database.py \
+    --protein_classification human_bone_marrow.classification_filtered.tsv \
+    --gene_lens gene_lens.tsv \
+    --pb_fasta human_bone_marrow.filtered_protein.fasta \
+    --gc_fasta gencode_protein.fasta \
+    --refined_info human_bone_marrow_orf_refined_gene_update.tsv \
+    --pb_cds_gtf human_bone_marrow_with_cds_filtered.gtf \
+    --name human_bone_marrow \
+    --lower_kb 1 \
+    --upper_kb 4 \
+    --lower_cpm 3 \
+
+#Finally, I think we can use this - even though it says compare the MS results - there isn’t as far as I can see any MS results but a comparison of the various ORF, Peptide and filtered results
+#/*--------------------------------------------------
+#Peptide Analysis
+# * Generate a table comparing MS peptide results
+# * between the PacBio and GENCODE databases. 
+#---------------------------------------------------*/
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1562-L1594
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base \
+     peptide_analysis.py \
+      -gmap gene_isoname.tsv \
+      --gencode_peptides gencode_protein.fasta \
+      --pb_refined_fasta human_bone_marrow.protein_refined.fasta \
+      --pb_filtered_fasta human_bone_marrow.filtered_protein.fasta \
+      --pb_hybrid_fasta human_bone_marrow_hybrid.fasta \
+      --pb_gene pb_gene.tsv \
+      -odir ./
+
+#But Finally Finally - I think we can similarly visualise these results using this routine:
+#/*--------------------------------------------------
+#Protein Track Visualization
+# * Creates tracks to use in UCSC Genome Browser for 
+# * refined, filtered, and hybrid PacBio databases.
+# * Shades tracks based on abundance (CPMs) and protein classification.
+#---------------------------------------------------*/
+#https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L1627-L1691
+#
+# refined
+#
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base gtfToGenePred human_bone_marrow_with_cds_refined.gtf human_bone_marrow_refined_cds.genePred
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base genePredToBed human_bone_marrow_refined_cds.genePred human_bone_marrow_refined_cds.bed12
+
+#
+# filtered
+#
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base gtfToGenePred human_bone_marrow_with_cds_filtered.gtf human_bone_marrow_filtered_cds.genePred
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base genePredToBed human_bone_marrow_filtered_cds.genePred human_bone_marrow_filtered_cds.bed12
+#
+# hybrid -- doesn't work..
+#
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base gtfToGenePred human_bone_marrow_hybrid.fasta human_bone_marrow_hybrid_cds.genePred
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base genePredToBed human_bone_marrow_hybrid_cds.genePred human_bone_marrow_hybrid_cds.bed12
+#
+# add RGB Colors refined
+#
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base \
+ track_add_rgb_colors_to_bed.py \
+    --name human_bone_marrow_refined \
+    --bed_file human_bone_marrow_refined_cds.bed12
+
+#
+# add RGB Colors filtered
+#
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base \
+ track_add_rgb_colors_to_bed.py \
+    --name human_bone_marrow_filtered \
+    --bed_file human_bone_marrow_filtered_cds.bed12
+
+#
+# add RGB Colors hybrid
+#
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base \
+ track_add_rgb_colors_to_bed.py \
+    --name human_bone_marrow_hybrid \
+    --bed_file human_bone_marrow_hybrid_cds.bed12
