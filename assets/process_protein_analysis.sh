@@ -243,7 +243,7 @@ docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base STAR 
 #* genome
 #---------------------------------------------------*/
 #https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L591-L653
-docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/sqanti3 sqanti3_qc.py BM_merged3.sort.flnc_BC.merge5.collapsed.no_random.no_alt.no_chrUn.gff gencode.v32.primary_assembly.annotation.gtf GRCh38.primary_assembly.genome.fa --skipORF -o human_bone_marrow --fl_count BM_merged3.sort.flnc_BC.merge5.collapsed.abundance.txt --gtf -c 100
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/sqanti3 sqanti3_qc.py BM_merged3.sort.flnc_BC.merge5.collapsed.no_random.no_alt.no_chrUn.gff gencode.v38.primary_assembly.annotation.gtf GRCh38.primary_assembly.genome.fa --skipORF -o human_bone_marrow --fl_count BM_merged3.sort.flnc_BC.merge5.collapsed.abundance.txt --gtf -c 100
 
 
 
