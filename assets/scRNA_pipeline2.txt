@@ -1,0 +1,182 @@
+#download fastq files
+wget --timestamping --user=P202SC19060296-01_07_30_19_OHty --password=8RLLE7jC "ftp://128.120.88.251/C202SC19060296/raw_data/H2TC3BBXX/KPC/*"
+
+#runfastQC
+./fastQC.sh
+
+#run cellranger from 10x genomics
+			   
+cellranger count --id=Blin_neg \
+                   --localmem=50 \
+                   --localcores=20 \
+                   --transcriptome=refdata-cellranger-GRCh38-3.0.0 \
+                   --fastqs=Novogene/fastq/Blin_neg \
+                   --sample=Blin_neg \
+                   --expect-cells=500				   
+
+#output:
+
+Blin_neg
+├── Blin_neg.mri.tgz
+├── _cmdline
+├── _filelist
+├── _finalstate
+├── _invocation
+├── _jobmode
+├── _log
+├── _mrosource
+├── _perf
+├── _sitecheck
+├── _tags
+├── _timestamp
+├── _uuid
+├── _vdrkill
+├── _versions
+└── outs
+    ├── analysis
+    │   ├── clustering
+    │   │   ├── graphclust
+    │   │   │   ├── cluster1.xlsx
+    │   │   │   ├── cluster2.csv
+    │   │   │   ├── cluster3.csv
+    │   │   │   ├── cluster4.xlsx
+    │   │   │   └── clusters.csv
+    │   │   ├── kmeans_10_clusters
+    │   │   │   └── clusters.csv
+    │   │   ├── kmeans_2_clusters
+    │   │   │   └── clusters.csv
+    │   │   ├── kmeans_3_clusters
+    │   │   │   └── clusters.csv
+    │   │   ├── kmeans_4_clusters
+    │   │   │   └── clusters.csv
+    │   │   ├── kmeans_5_clusters
+    │   │   │   └── clusters.csv
+    │   │   ├── kmeans_6_clusters
+    │   │   │   └── clusters.csv
+    │   │   ├── kmeans_7_clusters
+    │   │   │   └── clusters.csv
+    │   │   ├── kmeans_8_clusters
+    │   │   │   └── clusters.csv
+    │   │   └── kmeans_9_clusters
+    │   │       └── clusters.csv
+    │   ├── diffexp
+    │   │   ├── graphclust
+    │   │   │   └── differential_expression.csv
+    │   │   ├── kmeans_10_clusters
+    │   │   │   └── differential_expression.csv
+    │   │   ├── kmeans_2_clusters
+    │   │   │   └── differential_expression.csv
+    │   │   ├── kmeans_3_clusters
+    │   │   │   └── differential_expression.csv
+    │   │   ├── kmeans_4_clusters
+    │   │   │   └── differential_expression.csv
+    │   │   ├── kmeans_5_clusters
+    │   │   │   └── differential_expression.csv
+    │   │   ├── kmeans_6_clusters
+    │   │   │   └── differential_expression.csv
+    │   │   ├── kmeans_7_clusters
+    │   │   │   └── differential_expression.csv
+    │   │   ├── kmeans_8_clusters
+    │   │   │   └── differential_expression.csv
+    │   │   └── kmeans_9_clusters
+    │   │       └── differential_expression.csv
+    │   ├── pca
+    │   │   └── 10_components
+    │   │       ├── components.csv
+    │   │       ├── dispersion.csv
+    │   │       ├── features_selected.csv
+    │   │       ├── projection.csv
+    │   │       └── variance.csv
+    │   └── tsne
+    │       └── 2_components
+    │           └── projection.csv
+    ├── cloupe.cloupe
+    ├── filtered_feature_bc_matrix
+    │   ├── barcodes.tsv
+    │   ├── barcodes.tsv.gz
+    │   ├── features.tsv
+    │   ├── features.tsv.gz
+    │   ├── matrix.mtx
+    │   └── matrix.mtx.gz
+
+#move to R and run Seurat
+## follow: https://satijalab.org/seurat/articles/essential_commands.html
+# and https://satijalab.org/seurat/articles/pbmc3k_tutorial.html
+library("Seurat")
+library("dplyr")
+
+#do this for each sample:
+#import
+Blin_neg.counts <- Read10X(data.dir = "~/Downloads/Blin_neg/out/filtered_feature_bc_matrix/")
+#make Seurat object
+Blin_neg <- CreateSeuratObject(counts = Blin_neg.counts)
+#normalize
+Blin_neg <- NormalizeData(object = Blin_neg)
+#Identification of highly variable features
+Blin_neg <- FindVariableFeatures(object = Blin_neg)
+#scaling the data
+Blin_neg <- ScaleData(object = Blin_neg)
+#principal component analysis
+Blin_neg <- RunPCA(object = Blin_neg)
+##dimensionality
+Blin_neg <- JackStraw(Blin_neg, num.replicate = 100)
+Blin_neg <- ScoreJackStraw(Blin_neg, dims = 1:20)
+plot <- JackStrawPlot(Blin_neg, dims = 1:20)
+plot <- ElbowPlot(Blin_neg,ndims = 20)
+#clustering (vary the dims)
+Blin_neg <- FindNeighbors(object = Blin_neg)
+Blin_neg <- FindClusters(object = Blin_neg)
+#UMAP and tSNE plot:
+Blin_neg <- RunTSNE(object = Blin_neg, dims = 1:5)
+Blin_neg <- RunUMAP(Blin_neg, dims = 1:5)
+#visualize
+DimPlot(Blin_neg, reduction = "umap")
+#find markers
+Blin_neg_markers <- FindAllMarkers(Blin_neg, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.1)
+#visualize with specific markers
+plot <- VlnPlot(Blin_neg, features = c("THSD4","NEAT1","SYN3","ELF3","AFF3"))
+plot <- FeaturePlot(Blin_neg, features = to_plot)
+plot <- DotPlot(Blin_neg, features = to_plot) + coord_flip()
+
+#compare BM samples
+
+#Integration and Label Transfer
+#https://satijalab.org/seurat/v3.1/integration.html
+#Tutorial: Integrating stimulated vs. control PBMC datasets to learn cell-type specific responses
+#https://satijalab.org/seurat/v3.1/immune_alignment.html
+
+Blin.neg[["selection"]] = "lin.neg"
+B.BM.tot[["selection"]] = "total"
+
+#merge both seurat ojects
+BM.B.merge = merge(B.BM.tot,Blin.neg)
+
+#split the objects
+BM.B.split <- SplitObject(BM.B.merge, split.by = "selection")
+
+# Perform integration
+# We then identify anchors using the FindIntegrationAnchors function, which takes a list of Seurat objects as input, and use these anchors to integrate the two datasets together with IntegrateData.
+BM.B.anchors <- FindIntegrationAnchors(object.list = BM.B.split, dims = 1:20)
+BM.B.combined <- IntegrateData(anchorset = BM.B.anchors, dims = 1:20)
+
+# Perform an integrated analysis
+# Now we can run a single integrated analysis on all cells!
+
+DefaultAssay(BM.B.combined) <- "integrated"
+BM.B.combined <- ScaleData(BM.B.combined)
+BM.B.combined <- RunPCA(BM.B.combined)
+BM.B.combined <- RunUMAP(BM.B.combined, , dims = 1:20)
+BM.B.combined <- RunTSNE(BM.B.combined, , dims = 1:20)
+BM.B.combined = FindNeighbors(BM.B.combined, dims = 1:20)
+BM.B.combined = FindClusters(BM.B.combined, resolution = 0.5)
+
+# visualisation cluster plot by sample
+p1 <- DimPlot(BM.B.combined, reduction = "tsne", group.by = "selection")
+p2 <- DimPlot(BM.B.combined, reduction = "tsne", label = TRUE)
+plot_grid(p1, p2)
+
+# by cluster
+DimPlot(BM.B.combined, reduction = "tsne", split.by = "selection")
+
+#Identify conserved cell type markers
+BM_all.markers <- FindAllMarkers(BM.B.combined, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.25, grouping.var = "selection")

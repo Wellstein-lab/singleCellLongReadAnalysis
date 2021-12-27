@@ -266,7 +266,7 @@ docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/sqanti3 sqanti3_qc.py BM_
 # *        -full-splice_match 
 #---------------------------------------------------*/
 #https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e37#0/main.nf#L655-L731
-docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base filter_sqanti.py --sqanti_classification human_bone_marrow_classification.txt --sqanti_corrected_fasta human_bone_marrow_corrected.fasta --sqanti_corrected_gtf human_bone_marrow_corrected.gtf --protein_coding_genes protein_coding_genes.txt --ensg_gene ensg_gene.tsv --filter_protein_coding yes --filter_intra_polyA yes --filter_template_switching yes --percent_A_downstream_threshold 95 --structural_categories_level strict --minimum_illumina_coverage 3
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base filter_sqanti.py --sqanti_classification human_bone_marrow_classification.txt --sqanti_corrected_fasta human_bone_marrow_corrected.fasta --sqanti_corrected_gtf humgan_bone_marrow_corrected.gtf --protein_coding_genes protein_coding_genes.txt --ensg_gene ensg_gene.tsv --filter_protein_coding yes --filter_intra_polyA yes --filter_template_switching yes --percent_A_downstream_threshold 95 --structural_categories_level strict --minimum_illumina_coverage 3
 
 #
 # collapse_isoforms
