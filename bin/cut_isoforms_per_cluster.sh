@@ -14,6 +14,9 @@
 #
 #----------------------------------
 # Get the data
+mkdir -p ../data
+mkdir -p ../data/BC_ranked_isoforms
+
 cd ../data/BC_ranked_isoforms
 
 #
@@ -65,14 +68,14 @@ for file in $allcsv; do
     if [[ $file_ccsids == "Alin"* ]]; then 
 	echo "extracting Alin clusters and making " $file_ccsids_fasta
         seqkit grep -n -f $file_ccsids $Alin_neg_fasta > $file_ccsids_fasta
-    fi
-    if [[ $file_ccsids == "^Blin"* ]]; then
+    elif [[ $file_ccsids == "^Blin"* ]]; then
 	echo "extracting Blin clusters and making " $file_ccsids_fasta
 	seqkit grep -n -f $file_ccsids $Blin_neg_fasta > $file_ccsids_fasta
-    fi
-    if [[ $file_ccsids == "^B_BM_tot"* ]]; then
+    elif [[ $file_ccsids == "^B_BM_tot"* ]]; then
 	echo "extracting B_BM_tot clusters and making " $file_ccsids_fasta
 	seqkit grep -n -f $file_ccsids $B_BM_tot_fasta > $file_ccsids_fasta
+    else
+	echo "no match"
     fi
 
 done
