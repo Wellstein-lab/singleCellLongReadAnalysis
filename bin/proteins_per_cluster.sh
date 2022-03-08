@@ -1,5 +1,6 @@
 #!/bin/bash
 
+PWD=$(pwd)
 for file in *clust*fasta; do
     name="${file%%.*}"
     cpat="_cpat"

@@ -10,6 +10,11 @@
 # *   Abundances of transcripts (CPM) are collapsed during this process.
 #---------------------------------------------------*/
 #https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L923-L962
+# 
+# using container gsheynkmanlab/proteogenomics-base -- found here
+# https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/main/modules/make_gencode_database/Dockerfile
+
+PWD=$(pwd)
 
 for file in "*ORF_prob.best.tsv"; do
     name="${file%%.*}"
