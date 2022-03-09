@@ -39,18 +39,22 @@ conda install -c bioconda minimap2 -y
 conda install -c bioconda bedtools -y
 conda install -c bioconda ucsc-bedtogenepred -y
 conda install -c bioconda ucsc-genepredtogtf -y
-conda install -c bioconda samtools -y
+#
+# samtools is trying to find a dynamic library not loaded
+# Using solution https://github.com/conda/conda/issues/8103 suggested by ReneKat
+#
+conda install -c bioconda samtools=1.9 -y
 conda install -c bioconda gffread -y
 
-
-allccidsfasta="*_ccids.fasta"
+allccsidsfasta="*ccsids.fasta"
 reference_genome="../GRCh38.primary_assembly.genome.fa"
 
 cd ../data/BC_ranked_isoforms
+PWD=$(pwd)
+echo "Current Working Directory is = " $PWD
 
-for file in $allccidsfasta; do
-    
-    name=$(basename $file .fasta)
+for file in $allccsidsfasta; do
+    name="$(basename "$file" .fasta)"
     bam=".bam"
     bed=".bed"
     genepred=".genepred"
@@ -71,7 +75,7 @@ for file in $allccidsfasta; do
     echo "file_ccsids_gtf      = " $file_ccsids_gtf
     echo "file_ccsids_gff      = " $file_ccsids_gff
 
-    minimap2 -ax splice --cs $reference_genome $file | samtools sort -O BAM - > $file_ccsids_bam
+    minimap2 -ax map-pb $reference_genome $file | samtools sort -O BAM - > $file_ccsids_bam
     bedtools bamtobed -bed12 -i $file_ccsids_bam > $file_ccsids_bed
     bedToGenePred $file_ccsids_bed $file_ccsids_genepred
     genePredToGtf "file" $file_ccsids_genepred $file_ccsids_gtf
