@@ -56,32 +56,36 @@ echo "Current Working Directory is = " $PWD
 for file in $allccsidsfasta; do
     name="$(basename "$file" .fasta)"
     bam=".bam"
+    sam=".sam"
+    merge5=".merge5"
     bed=".bed"
     genepred=".genepred"
     gff=".gff"
     gtf=".gtf"
     file_ccsids_bam="$name$bam"
+    file_ccsids_sam="$name$sam"
+    file_ccsids_merge5="$name$merge5"
     file_ccsids_bed="$name$bed"
     file_ccsids_genepred="$name$genepred"
     file_ccsids_gtf="$name$gtf"
     file_ccsids_gff="$name$gff"
-
         
     echo "name=" $name
     echo "file=" $file
+    echo "file_ccsids_merge5   = " $file_ccsids_merge5
     echo "file_ccsids_bam      = " $file_ccsids_bam
+    echo "file_ccsids_sam      = " $file_ccsids_sam
     echo "file_ccsids_bed      = " $file_ccsids_bed
     echo "file_ccsids_genepred = " $file_ccsids_genepred
     echo "file_ccsids_gtf      = " $file_ccsids_gtf
     echo "file_ccsids_gff      = " $file_ccsids_gff
 
-    minimap2 -ax map-pb $reference_genome $file | samtools sort -O BAM - > $file_ccsids_bam
-    bedtools bamtobed -bed12 -i $file_ccsids_bam > $file_ccsids_bed
-    bedToGenePred $file_ccsids_bed $file_ccsids_genepred
-    genePredToGtf "file" $file_ccsids_genepred $file_ccsids_gtf
-    gffread -E $file_ccsids_gtf -o $file_ccsids_gff
+    minimap2 -ax map-pb $reference_genome $file > $file_ccsids_sam
+    collapse_isoforms_by_sam.py --input $file -s $file_ccsids_sam -c 0.99 -i 0.95 --gen_mol_count -o  $file_ccsids_merge5
+#    samtools sort -O BAM  > $file_ccsids_bam
+#    bedtools bamtobed -bed12 -i $file_ccsids_bam > $file_ccsids_bed
+#    bedToGenePred $file_ccsids_bed $file_ccsids_genepred
+#    genePredToGtf "file" $file_ccsids_genepred $file_ccsids_gtf
+#    gffread -E $file_ccsids_gtf -o $file_ccsids_gff
 
 done
-
-    
-	  
