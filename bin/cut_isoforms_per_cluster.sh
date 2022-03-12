@@ -43,19 +43,49 @@ allcsv="*.csv"
 
 
 for file in $allcsv; do
-    
+
+    # simple to understand - but need to know the ending
+    name2="$(basename "$file" .csv)"
+    # more difficult to parse -- no need to know the ending -- so what is happening
+    # What we want is the prefix of the file so we can name all of the files
+    # Bash has special letters used to do that
+    # $() means evaluate this and then the rest of the line
+    # ${} means expand the name first and then the line -- since file is a variable
+    #    We need this.
     name="${file%%.*}"
     
-    echo "name=" $name
-    echo "file=" $file
-    
+    bam=".bam"
+    sam=".sam"
+    sortedbam=".sorted.bam"
+    sortedsam=".sorted.sam"
+    merge5collapsedabundance="_merge5.collapsed.abundance.txt"
+    merge5collapsedgff="_merge5.collapsed.gff"
+    merge5collapsedgffunfuzzy="_merge5.collapsed.gff.unfuzzy"
+    merge5collapsedgrouptxt="_merge5.collapsed.group.txt"
+    merge5collapsedgrouptxtunfuzzy="_merge5.collapsed.group.txt.unfuzzy"
+    merge5collapsedrepfa="_merge5.collapsed.rep.fa"
+    merge5ignoredids="_merge5.ignored_ids.txt"
     pbids="_pbids.csv"
     ccsids="_ccsids.csv"
     ccsfasta="_ccsids.fasta"
     file_pbids="$name$pbids"
     file_ccsids="$name$ccsids"
     file_ccsids_fasta="$name$ccsfasta"
+    file_ccsids_bam="$name$bam"
+    file_ccsids_sorted_bam="$name$sortedbam"
+    file_ccsids_sam="$name$sam"
+    file_ccsids_sorted_sam="$name$sortedsam"
+    file_ccsids_merge5="$name$merge5"
+    file_ccids_merge5collapsedabundance="$name$merge5collapsedabundance"
+    file_ccids_merge5collapsedgff="$name$merge5collapsedgff"
+    file_ccids_merge5collapsedgffunfuzzy="$name$merge5collapsedgffunfuzzy"
+    file_ccids_merge5collapsedgrouptxt="$name$merge5collapsedgrouptxt"
+    file_ccids_merge5collapsedgrouptxtunfuzzy="$name$merge5collapsedgrouptxtunfuzzy"
+    file_ccids_merge5collapsedrepfa="$name$merge5collapsedrepfa"
+    file_merge5ignoredids="$name$merge5ignoredids"
     
+    echo "name=" $name
+    echo "file=" $file
     echo "file_pbids        = " $file_pbids
     echo "file_ccsids       = " $file_ccsids
     echo "file_ccsids_fasta = " $file_ccsids_fasta

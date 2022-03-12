@@ -45,9 +45,9 @@ echo "Current Working Directory is = " $PWD
 for file in $allccsidsfasta; do
     name="$(basename "$file" .fasta)"
     bam=".bam"
-    bam=".sorted.bam"
+    sortedbam=".sorted.bam"
     sam=".sam"
-    sam=".sorted.sam"
+    sortedsam=".sorted.sam"
     merge5=".merge5"
     bed=".bed"
     genepred=".genepred"
