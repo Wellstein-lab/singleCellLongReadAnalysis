@@ -21,29 +21,21 @@
 #https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e37#0/main.nf#L655-L731
 
 
-cd ../data/BC_ranked_isoforms
-PWD=$(pwd)
-echo "Current Working Directory is = " $PWD
-
 gtf=".gtf"
 fasta=".fasta"
 merge5=".merge5.collapsed"
-corrected=".corrected"
-classified=".classification.txt"
-allclassfied="*classification.txt"
-
-echo "gencode_primary_assembly_annotation = " $gencode_primary_assembly_annotation
-echo "reference_genome                    = " $reference_genome
-echo "allclassified                       = " $allclassified
+corrected="_corrected"
+classification="_classification.txt"
+allclassified="*classification.txt"
 
 cd ../data/BC_ranked_isoforms
 
 PWD=$(pwd)
-
-echo "current working directory = " $PWD
+echo "Current Working Directory is = " $PWD
+echo "allclassified                = " $allclassified
 
 # loop through 
-for file in $allcollapsedrepfasta; do
+for file in $allclassified; do
     name="${file%%.*}"
     name_merge5=$name$merge5
     name_merge5_classification=$name$merge5$classification
