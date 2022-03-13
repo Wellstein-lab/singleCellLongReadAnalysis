@@ -232,6 +232,7 @@ docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base make_
 # run on a dedicated instance within cloudOS 8 vCPUs 61 GB RAM, 1000 GB
 #TODO: put into a nextflow script rather than command line running of a container
 #NICETOHAVE: make a container just for STAR rather than using the entire proteogenomics-base
+#TODO: Just put the d*** results of the index we care about up on Zenodo 
 docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base STAR --runThreadN 8 --runMode genomeGenerate --genomeDir star_genome --genomeFastaFiles GRCh38.primary_assembly.genome.fa --sjdbGTFfile gencode.v32.primary_assembly.annotation.gtf --genomeSAindexNbases 11 --limitGenomeGenerateRAM 66952278784
 
 #And then sqanti3
