@@ -15,7 +15,7 @@ filtered="filtered_"
 corrected="_corrected"
 degfilter=".5degfilter"
 sixframe=".6frame"
-classification_tsv="5degfilter_classification.5degfilter.tsv"
+classification_tsv=".5degfilter_classification.5degfilter.tsv"
 
 cd ../data/BC_ranked_isoforms
 
@@ -33,8 +33,8 @@ for file in $allfiltered; do
     name="${file%%.*}"
 
     name_merge5_corrected_classification=$name$merge5$corrected$classification_tsv
-    name_merge5_corrected_5degfilter_fasta=$name$merg5$corrected$degfilter$fasta
-    name_merge5_corrected_5degfilter_sixframe_fasta=$name$merg5$corrected$degfilter$sixframe$fasta
+    name_merge5_corrected_5degfilter_fasta=$name$merge5$corrected$degfilter$fasta
+    name_merge5_corrected_5degfilter_sixframe_fasta=$name$merge5$corrected$degfilter$sixframe$fasta
     
     echo "file                                            = " $file
     echo "name                                            = " $name
