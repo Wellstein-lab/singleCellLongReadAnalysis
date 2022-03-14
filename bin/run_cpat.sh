@@ -43,7 +43,7 @@ echo "allfiltered                  = " $allfiltered
 #wget https://zenodo.org/record/5703754/files/Human_logitModel.RData.gz
 
 human_hexamer="Human_Hexamer.tsv"
-human_logitmodel="Human_logitModel.RData.gz"
+human_logitmodel="Human_logitModel.RData"
 
 cpat_output="_cpat.out"
 cpat_error="_cpat.error"
