@@ -13,7 +13,6 @@ allclassified="*classification.txt"
 allfiltered="filtered_*.tsv"
 degfilter=".5degfilter"
 classification_tsv="_classification.tsv"
-filtered_Blin_neg_filt_ranked_BC_clust9_B_ccsids.merge5.collapsed_corrected.5degfilter.fasta
 
 cd ../data/BC_ranked_isoforms
 

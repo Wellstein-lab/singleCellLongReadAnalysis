@@ -65,19 +65,18 @@ for file in $allorfs; do
     echo "name_merge5_corrected_5degfilter_best_orf       = " $name_merge5_corrected_5degfilter_best_orf
     echo "name_merge5_corrected_5degfilter_fasta          = " $name_merge5_corrected_5degfilter_fasta
     echo "name_merge5_corrected_5degfilter_classification = " $name_merge5_corrected_5degfilter_classification
-    echo "name_merge5_corrected_5degfilter_best_orf       = " $name_merge5_corrected_5degfilter_best_orf
     echo "name_merge5_corrected_gtf                       = " $name_merge5_corrected_gtf
     
-#    docker run -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base orf_calling.py \
-#	   --orf_coord      $file \
-#           --orf_fasta      $name_merge5_corrected_5degfilter_orf_fasta \
-#	   --gencode        $gencode_primary_assembly_annotation \
-#	   --sample_gtf     $name_merge5_corrected_gtf \
-#	   --pb_gene        $pb_gene \
-#           --classification $name_merge5_5degfilter_classification \
-#	   --sample_fasta   $name_merge5_5degfilter_fasta \
-#	   --num_cores      8 \
-#           --output         $name_merge5_5degfilter_best_orf
+    docker run -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base orf_calling.py \
+	   --orf_coord      $file \
+           --orf_fasta      $name_merge5_corrected_5degfilter_orf_fasta \
+	   --gencode        $gencode_primary_assembly_annotation \
+	   --sample_gtf     $name_merge5_corrected_gtf \
+	   --pb_gene        $pb_gene \
+           --classification $name_merge5_5degfilter_classification \
+	   --sample_fasta   $name_merge5_5degfilter_fasta \
+	   --num_cores      8 \
+           --output         $name_merge5_5degfilter_best_orf
 
 done
 
