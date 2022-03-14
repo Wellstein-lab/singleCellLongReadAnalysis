@@ -40,32 +40,30 @@ coding_score_cutoff=0.364
 cd ../data/BC_ranked_isoforms
 PWD=$(pwd)
 
-allorfs="*.ORF_prob.tsv"
+allorfprobbest="*.ORF_prob.best.tsv"
 
 echo "Current Working Directory is = " $PWD
 echo "allorfs                      = " $allorfs
 echo "coding_score_cutoff          = " $coding_score_cutoff
 
 # loop through 
-for file in $allorfs; do
+for file in $allorfprobbest; do
     name="${file%%.*}"
 
     name_merge5_corrected_5degfilter_refined=$name$merge5$corrected$degfilter$refined
-    name_merge5_corrected_5degfilter_best_orf=$name$merge5$corrected$degfilter$best_orf
     name_merge5_corrected_5degfilter_fasta=$name$merge5$corrected$degfilter$fasta
     
     echo "file                                            = " $file
     echo "name                                            = " $name
     echo "name_merge5_corrected_5degfilter                = " $name_merge5_corrected_5degfilter
     echo "name_merge5_corrected_5degfilter_refined        = " $name_merge5_corrected_5degfilter_refined
-    echo "name_merge5_corrected_5degfilter_best_orf       = " $name_merge5_corrected_5degfilter_best_orf
     echo "name_merge5_corrected_5degfilter_fasta          = " $name_merge5_corrected_5degfilter_fasta
     
-#    docker run -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base refine_orf_database.py \
-#	   --name                $name_merge5_corrected_5degfilter_refined \
-#	   --orfs                $name_merge5_corrected_5degfilter_best_orf \
-#	   --pb_fasta            $name_merge5_corrected_5degfilter_fasta \
-#           --coding_score_cutoff $coding_score_cutoff
+    docker run -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base refine_orf_database.py \
+	   --name                $name_merge5_corrected_5degfilter_refined \
+	   --orfs                $file \
+	   --pb_fasta            $name_merge5_corrected_5degfilter_fasta \
+           --coding_score_cutoff 0.364
 
 done
 
