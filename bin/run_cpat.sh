@@ -65,12 +65,12 @@ for file in $allfiltered; do
     echo "name_merge5_corrected_5degfilter_cpat_error     = " $name_merge5_corrected_5degfilter_cpat_error
     
     docker run -v $PWD:$PWD -w $PWD -it gsheynkmanlab/cpat:addr cpat.py \
-       -x $hexamer \
-       -d $logit_model \
+       -x $human_hexamer \
+       -d $human_logitmodel \
        -g $file \
        --min-orf=50 \
        --top-orf=50 \
-       -o $name_merge5_corrected_5degfiltered \
+       -o $name_merge5_corrected_5degfilter \
        1> $name_merge5_corrected_5degfilter_cpat_output \
        2> $name_merge5_corrected_5degfilter_cpat_error
 
