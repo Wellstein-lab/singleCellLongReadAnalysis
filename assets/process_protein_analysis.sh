@@ -417,7 +417,8 @@ docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base orf_c
 # *   Abundances of transcripts (CPM) are collapsed during this process.
 #---------------------------------------------------*/
 #https://github.com/sheynkman-lab/Long-Read-Proteogenomics/blob/23e345dafb0ef90e479cac94a29e3d702472e370/main.nf#L923-L962
-docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base refine_orf_database.py --name human_bone_marrow --orfs human_bone_marrow_best_orf.tsv --pb_fasta human_bone_marrow_corrected.5degfilter.fasta --coding_score_cutoff 0.364
+docker run --rm -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base refine_orf_database.py --name human_bone_marrow \
+       --orfs human_bone_marrow_best_orf.tsv --pb_fasta human_bone_marrow_corrected.5degfilter.fasta --coding_score_cutoff 0.364
 
 
 #Then we do some clean up with the CDS GTF

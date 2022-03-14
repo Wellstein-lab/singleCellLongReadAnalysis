@@ -56,13 +56,13 @@ for file in $allsqanticlassification; do
     echo "name                                                    = " $name
     echo "name_merge5_corrected_5degfilter_classification_pb_gene = " $name_merge5_corrected_5degfilter_classification_pb_gene
     
-#    docker run --rm -v $PWD:$PWD -w $PWD -it ghcr.io/adeslatt/transcriptome-summary-docker transcriptome_summary.py \
-#	   --sq_out $file \
-#	   --ensg_to_gene ensg_gene.tsv \
-#	   --enst_to_isoname isoname_lens.tsv \
-#	   --len_stats gene_lens.tsv \
-#	   --odir junk
-    
-#    mv $pb_gene_tsv $name_merge5_corrected_5degfilter_classification_pb_gene
+    docker run --rm -v $PWD:$PWD -w $PWD -it ghcr.io/adeslatt/transcriptome-summary-docker transcriptome_summary.py \
+	   --sq_out $file \
+	   --ensg_to_gene ensg_gene.tsv \
+	   --enst_to_isoname isoname_lens.tsv \
+	   --len_stats gene_lens.tsv \
+	   --odir junk
+   
+    mv $pb_gene_tsv $name_merge5_corrected_5degfilter_classification_pb_gene
     
 done
