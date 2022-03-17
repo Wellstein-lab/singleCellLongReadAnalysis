@@ -19,7 +19,8 @@ merge5=".merge5.collapsed"
 filtered="filtered_"
 corrected="_corrected"
 degfilter=".5degfilter"
-refined="_refined"
+refined_orf="_refined_orf_refined.fasta"
+refined_tsv="_refined_orf_refined.tsv"
 orf_prob_best=".ORF_prob.best.tsv"
 orf_prob=".ORF_prob.tsv"
 orf_fasta=".ORF_seqs.fa"
@@ -27,6 +28,8 @@ no_orf=".no_ORF.txt"
 best_orf=".best_orf.tsv"
 classification=".5degfilter_classification.5degfilter"
 pb_gene=".pb_gene.tsv"
+with_transcript="_with_transcript"
+no_transcript="_no_transcript"
 
 cd ../data/BC_ranked_isoforms
 PWD=$(pwd)
@@ -43,6 +46,9 @@ for file in $allorfprobbest; do
     name_merge5_corrected_5degfilter_with_transcript=$name$merge5$corrected$degfilter$with_transcript
     name_merge5_corrected_5degfilter_no_transcript=$name$merge5$corrected$degfilter$no_transcript
     name_merge5_corrected_5degfilter_orf_prob_best=$name$merge5$corrected$degfilter$orf_prob_best
+    name_merge5_corrected_5degfilter_best_orf=$name$merge5$corrected$degfilter$best_orf
+    name_merge5_corrected_5degfilter_refined_orf=$name$merge5$corrected$degfilter$refined_orf
+    name_merge5_corrected_5degfilter_refined_tsv=$name$merge5$corrected$degfilter$refined_tsv
     name_merge5_corrected_5degfilter_fasta=$name$merge5$corrected$degfilter$fasta
     name_merge5_corrected_5degfilter_classification_pb_gene=$name$merge5$corrected$classification$pb_gene
     name_merge5_corrected_gtf=$name$merge5$corrected$gtf
@@ -53,23 +59,26 @@ for file in $allorfprobbest; do
     echo "name_merge5_corrected_5degfilter_fasta          = " $name_merge5_corrected_5degfilter_fasta
     echo "name_merge5_corrected_5degfilter_with_transcript= " $name_merge5_corrected_5degfilter_with_transcript
     echo "name_merge5_corrected_5degfilter_no_transcript  = " $name_merge5_corrected_5degfilter_no_transcript
+    echo "name_merge5_corrected_5degfilter_best_orf       = " $name_merge5_corrected_5degfilter_best_orf
+    echo "name_merge5_corrected_5degfilter_refined_orf    = " $name_merge5_corrected_5degfilter_refined_orf
+    echo "name_merge5_corrected_5degfilter_refined_tsv    = " $name_merge5_corrected_5degfilter_refined_tsv
     echo "name_merge5_corrected_5degfilter_orf_prob_best  = " $name_merge5_corrected_5degfilter_orf_prob_best
     echo "name_merge5_corrected_5degfilter_classification_pb_gene = " $name_merge5_corrected_5degfilter_classification_pb_gene
     
     docker run -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base:v1.0 make_pacbio_cds_gtf.py \
-	   --name $name_merge5_corrected_5degfilter_with_transcript \
-	   --sample_gtf $name_merge5_corrected_gtf \
-	   --refined_database $file \
-           --called_orfs $name_merge5_corrected_5degfilter_orf_prob_best \
-	   --pb_gene $name_merge5_corrected_5degfilter_classification_pb_gene \
+	   --name               $name_merge5_corrected_5degfilter_with_transcript \
+	   --sample_gtf         $name_merge5_corrected_gtf \
+	   --refined_database   $name_merge5_corrected_5degfilter_refined_tsv \
+           --called_orfs        $name_merge5_corrected_5degfilter_best_orf \
+	   --pb_gene            $name_merge5_corrected_5degfilter_classification_pb_gene \
 	   --include_transcript yes
 
     docker run -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base:v1.0 make_pacbio_cds_gtf.py \
-	   --name $name_merge5_corrected_5degfilter_no_transcript \
-	   --sample_gtf $name_merge5_corrected_gtf \
-	   --refined_database $file \
-           --called_orfs $name_merge5_corrected_5degfilter_orf_prob_best \
-	   --pb_gene $name_merge5_corrected_5degfilter_classification_pb_gene \
+	   --name               $name_merge5_corrected_5degfilter_no_transcript \
+	   --sample_gtf         $name_merge5_corrected_gtf \
+	   --refined_database   $name_merge5_corrected_5degfilter_refined_tsv \
+           --called_orfs        $name_merge5_corrected_5degfilter_best_orf \
+	   --pb_gene            $name_merge5_corrected_5degfilter_classification_pb_gene \
 	   --include_transcript no
 
 done
