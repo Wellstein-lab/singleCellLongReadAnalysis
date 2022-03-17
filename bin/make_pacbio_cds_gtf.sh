@@ -56,21 +56,21 @@ for file in $allorfprobbest; do
     echo "name_merge5_corrected_5degfilter_orf_prob_best  = " $name_merge5_corrected_5degfilter_orf_prob_best
     echo "name_merge5_corrected_5degfilter_classification_pb_gene = " $name_merge5_corrected_5degfilter_classification_pb_gene
     
-#    docker run -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base make_pacbio_cds_gtf.py \
-#	   --name $name_merge5_corrected_5degfilter_with_transcript \
-#	   --sample_gtf $name_merge5_corrected_gtf \
-#	   --refined_database $file \
-#           --called_orfs $name_merge5_corrected_5degfilter_orf_prob_best \
-#	   --pb_gene $name_merge5_corrected_5degfilter_classification_pb_gene \
-#	   --include_transcript yes
-#
-#    docker run -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base make_pacbio_cds_gtf.py \
-#	   --name $name_merge5_corrected_5degfilter_no_transcript \
-#	   --sample_gtf $name_merge5_corrected_gtf \
-#	   --refined_database $file \
-#           --called_orfs $name_merge5_corrected_5degfilter_orf_prob_best \
-#	   --pb_gene $name_merge5_corrected_5degfilter_classification_pb_gene \
-#	   --include_transcript no
+    docker run -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base:v1.0 make_pacbio_cds_gtf.py \
+	   --name $name_merge5_corrected_5degfilter_with_transcript \
+	   --sample_gtf $name_merge5_corrected_gtf \
+	   --refined_database $file \
+           --called_orfs $name_merge5_corrected_5degfilter_orf_prob_best \
+	   --pb_gene $name_merge5_corrected_5degfilter_classification_pb_gene \
+	   --include_transcript yes
+
+    docker run -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base:v1.0 make_pacbio_cds_gtf.py \
+	   --name $name_merge5_corrected_5degfilter_no_transcript \
+	   --sample_gtf $name_merge5_corrected_gtf \
+	   --refined_database $file \
+           --called_orfs $name_merge5_corrected_5degfilter_orf_prob_best \
+	   --pb_gene $name_merge5_corrected_5degfilter_classification_pb_gene \
+	   --include_transcript no
 
 done
 
