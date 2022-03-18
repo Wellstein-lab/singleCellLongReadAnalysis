@@ -30,8 +30,7 @@ no_orf=".no_ORF.txt"
 best_orf=".best_orf.tsv"
 classification=".5degfilter_classification.5degfilter"
 pb_gene=".pb_gene.tsv"
-with_transcript="_with_transcript"
-no_transcript="_no_transcript"
+with_transcript="_with_transcript_with_cds"
 
 cd ../data/BC_ranked_isoforms
 PWD=$(pwd)
@@ -44,20 +43,18 @@ echo "all with transcript gtf      = " $allwithgtf
 # loop through 
 for file in $allwithgtf; do
     name="${file%%.*}"
-    name_merge5_corrected_5degfilter_with_transcript=$name$merge5$degfilter$with_transcript
-    name_merge5_corrected_5degfilter_with_transcript_gtf=$name$merge5$degfilter$with_transcript$gtf
+    name_merge5_corrected_5degfilter_with_transcript=$name$merge5$corrected$degfilter$with_transcript
+    name_merge5_corrected_5degfilter_with_transcript_gtf=$name$merge5$corrected$degfilter$with_transcript$gtf
 
-    echo "file                                                 = " $file
     echo "name                                                 = " $name
+    echo "file                                                 = " $file
     echo "name_merge5_corrected_5degfilter_with_transcript     = " $name_merge5_corrected_5degfilter_with_transcript
     echo "name_merge5_corrected_5degfilter_with_transcript_gtf = " $name_merge5_corrected_5degfilter_with_transcript_gtf
 
-            rename_cds_to_exon.py \
-
-    docker run -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base:v1.0 rename_cds_to_exon \
+    docker run -v $PWD:$PWD -w $PWD gsheynkmanlab/sqanti_protein:sing rename_cds_to_exon.py \
 	   --sample_gtf             $name_merge5_corrected_5degfilter_with_transcript_gtf \
            --sample_name            $name_merge5_corrected_5degfilter_with_transcript \
-           --reference_gtf          $reference_gtf \
+           --reference_gtf          $gencode_primary_assembly_annotation \
            --reference_name         gencode \
            --num_cores 8
 
