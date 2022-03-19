@@ -57,13 +57,14 @@ for file in $allwithgtf; do
     echo "name_merge5_corrected_5degfilter_best_orf                                  = " $name_merge5_corrected_5degfilter_best_orf
     
     # variables need to be provided in a specific order
-#    docker run -v $PWD:$PWD -w $PWD gsheynkmanlab/sqanti_protein:sing sqanti3_protein.py \
-#	   $name_merge5_corrected_5degfilter_with_transcript_with_cds_exons_only_gtf \
-#	   $name_merge5_corrected_5degfilter_with_transcript_with_cds_renamed_exon_gtf \
-#	   $name_merge5_corrected_5degfilter_best_orf \
-#	   gencode.transcript_exon_only.gtf gencode.cds_renamed_exon.gtf \
-#	   -d . \
-#           -p $param_name
+    docker run -v $PWD:$PWD -w $PWD gsheynkmanlab/sqanti_protein:sing sqanti3_protein.py \
+	   $name_merge5_corrected_5degfilter_with_transcript_with_cds_exons_only_gtf \
+	   $name_merge5_corrected_5degfilter_with_transcript_with_cds_renamed_exon_gtf \
+	   $name_merge5_corrected_5degfilter_best_orf \
+	   gencode.transcript_exon_only.gtf \
+	   gencode.cds_renamed_exon.gtf \
+	   -d . \
+           -p $param_name
    
 done
 
