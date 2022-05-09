@@ -1,11 +1,16 @@
 #!/bin/bash
 #/*--------------------------------------------------
-#Then we do some clean up with the CDS GTF
-#/*--------------------------------------------------
-#Rename CDS to Exon
-# * Preprocessing step to SQANTI Protein
-# * CDS is renamed to exon and transcript stop and start
-# * locations are updated to reflect CDS start and stop
+# repurposing five_prime_utr process from the
+#  Long Read Proteogenomics Workflow
+#  https://github.com/sheynkman-lab/Long-Read-Proteogenomics/main.nf
+#
+# 2022 MAY 9 - step 1 ran but not step 2
+# 
+#  5' UTR Status
+# * Intermediate step for protein classification
+# * Dtermines the 5' UTR status of the protein in order 
+# * to classify protein category in latter step
+#
 #---------------------------------------------------*/
 
 gencode_primary_assembly_annotation="gencode.v32.primary_assembly.annotation.gtf"
@@ -33,48 +38,58 @@ pb_gene=".pb_gene.tsv"
 with_transcript_with_cds="_with_transcript_with_cds"
 cds_renamed_exon=".cds_renamed_exon"
 transcript_exons_only=".transcript_exons_only"
+sqanti_w_5utr="_sqanti_protein_classification_w_5utr_info.tsv"
 
 cd ../data/BC_ranked_isoforms
 PWD=$(pwd)
 
-allwithgtf="*cds.transcript_exons_only.gtf"
+allsqantiproteinclasstsv="*sqanti_protein_classification.tsv"
 
 echo "Current Working Directory is = " $PWD
-echo "all with transcript gtf      = " $allwithgtf
+echo "all sqantiproteinclasstsv    = " $allsqantiproteinclasstsv
+
 
 #
 # this is run just once - if the version of Gencode changes
 # -- TODO - move this in the data preparation step -- the reference set up step
 #  this is the command as run on the gencode.v32.primary_assembly.annotation.gtf
-#
-#  docker run -v $PWD:$PWD -w $PWD gsheynkmanlab/proteogenomics-base:v1.0 1_get_gc_exon_and_5utr_info.py --gencode_gtf gencode.v32.primary_assembly.annotation.gtf --odir ./
 
-# loop through
-#
-for file in $allwithgtf; do
+#docker run -v $PWD:$PWD -w $PWD gsheynkmanlab/proteogenomics-base:v1.0 1_get_gc_exon_and_5utr_info.py --gencode_gtf gencode.v32.primary_assembly.annotation.gtf --odir ./
+
+
+# loop through cds scripts
+# step 2
+for file in $allwithcds; do
     name="${file%%.*}"
-    name_merge5_corrected_5degfilter_with_transcript_with_cds_exons_only_gtf=$name$merge5$corrected$degfilter$with_transcript_with_cds$transcript_exons_only$gtf
-    name_merge5_corrected_5degfilter_with_transcript_with_cds_renamed_exon_gtf=$name$merge5$corrected$degfilter$with_transcript_with_cds$cds_renamed_exon$gtf
-    name_merge5_corrected_5degfilter_best_orf=$name$merge5$corrected$degfilter$best_orf
-    param_name=$name$merge5$corrected$degfilter
-
-    echo "name                                                                       = " $name
-    echo "file                                                                       = " $file
-    echo "name_merge5_corrected_5degfilter_with_transcript_with_cds_exon_only_gtf    = " $name_merge5_corrected_5degfilter_with_transcript_with_cds_exons_only_gtf
-    echo "name_merge5_corrected_5degfilter_with_transcript_with_cds_renamed_exon_gtf = " $name_merge5_corrected_5degfilter_with_transcript_with_cds_renamed_exon_gtf
-    echo "name_merge5_corrected_5degfilter_best_orf                                  = " $name_merge5_corrected_5degfilter_best_orf
-    
-    docker run -v $PWD:$PWD -w $PWD gsheynkmanlab/proteogenomics-base:v1.0 2_classify_5utr_status.py \
-	   --gencode_exons_bed gencode_exons_for_cds_containing_ensts.bed --gencode_exons_chain gc_exon_chain_strings_for_cds_containing_transcripts.tsv --sample_cds_gtf filtered_Blin_neg_filt_ranked_BC_clust0_B_ccsids.merge5.collapsed_corrected.5degfilter_with_transcript_with_cds.gtf --odir ./
-    # variables need to be provided in a specific order
-    docker run -v $PWD:$PWD -w $PWD gsheynkmanlab/sqanti_protein:sing sqanti3_protein.py \
-	   $name_merge5_corrected_5degfilter_with_transcript_with_cds_exons_only_gtf \
-	   $name_merge5_corrected_5degfilter_with_transcript_with_cds_renamed_exon_gtf \
-	   $name_merge5_corrected_5degfilter_best_orf \
-	   gencode.transcript_exon_only.gtf \
-	   gencode.cds_renamed_exon.gtf \
-	   -d . \
-           -p $param_name
-   
+    echo "name = " $name
+    echo "file = " $file
+    docker run -v $PWD:$PWD -w $PWD gsheynkmanlab/proteogenomics-base:v1.0 \
+         2_classify_5utr_status.py \
+         --gencode_exons_bed gencode_exons_for_cds_containing_ensts.bed \
+         --gencode_exons_chain gc_exon_chain_strings_for_cds_containing_transcripts.tsv \
+         --sample_cds_gtf $file \
+         --odir ./ 
 done
 
+    
+
+# loop through
+# step 3
+#for file in $allsqantiproteinclasstsv; do
+#    name="${file%%.*}"
+#    name_sqanti_w_5utr=$name$sqanti_w_5utr
+#
+#    echo "name              = "$name
+#    echo "file              = "$file
+#    echo "name_sqanti_w5utr = "$name_sqanti_w_5utr
+
+#    3_merge_5utr_info_to_pclass_table.py \
+#    --name ${params.name} \
+#    --utr_info pb_5utr_categories.tsv \
+#    --sqanti_protein_classification $sqanti_protein_classification \
+#    --odir ./
+
+done
+
+
+    
