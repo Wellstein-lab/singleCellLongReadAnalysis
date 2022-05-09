@@ -8,7 +8,7 @@ cd ../data/BC_ranked_isoforms
 PWD=$(pwd)
 
 allfilteredgenepred="filtered*transcript_exons_only.genePred"
-end="filtered_genePred_names.txt"
+end="_filtered_genePred_names.txt"
 echo "Current Working Directory is = " $PWD
 
 # loop through all filtered genePred files and print the gene name
