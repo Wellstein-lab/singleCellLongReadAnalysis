@@ -14,9 +14,7 @@ junctions="_B_ccsids.merge5.collapsed_junctions.txt"
 Blin_neg="Blin_neg_filt_ranked_BC_clust"
 B_BM_tot="B_BM_tot_filt_ranked_BC_clust"
 
-clusters=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9")
-
-for clust in $clusters; do
+for ((clust=0;clust<=9;clust++)); do
     blin_clust_gtf=$Blin_neg$clust$gtf
     blin_clust_class=$Blin_neg$clust$class
     blin_clust_junctions=$Blin_neg$clust$junctions
