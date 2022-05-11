@@ -1,0 +1,19 @@
+grep -i "novel" filtered_Blin_neg_filt_ranked_BC_clust1_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv 
+grep -i "novel" filtered_Blin_neg_filt_ranked_BC_clust1_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_Blin_neg_clust1_novel.tsv
+grep -i "novel" filtered_Blin_neg_filt_ranked_BC_clust2_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_Blin_neg_clust2_novel.tsv
+grep -i "novel" filtered_Blin_neg_filt_ranked_BC_clust3_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_Blin_neg_clust3_novel.tsv
+grep -i "novel" filtered_Blin_neg_filt_ranked_BC_clust4_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_Blin_neg_clust4_novel.tsv
+grep -i "novel" filtered_Blin_neg_filt_ranked_BC_clust5_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_Blin_neg_clust5_novel.tsv
+grep -i "novel" filtered_Blin_neg_filt_ranked_BC_clust6_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_Blin_neg_clust6_novel.tsv
+grep -i "novel" filtered_Blin_neg_filt_ranked_BC_clust7_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_Blin_neg_clust7_novel.tsv
+grep -i "novel" filtered_Blin_neg_filt_ranked_BC_clust8_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_Blin_neg_clust8_novel.tsv
+grep -i "novel" filtered_Blin_neg_filt_ranked_BC_clust9_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_Blin_neg_clust9_novel.tsv
+grep -i "novel" filtered_B_BM_tot_filt_ranked_BC_clust1_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_B_BM_tot_clust1_novel.tsv
+grep -i "novel" filtered_B_BM_tot_filt_ranked_BC_clust2_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_B_BM_tot_clust2_novel.tsv
+grep -i "novel" filtered_B_BM_tot_filt_ranked_BC_clust3_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_B_BM_tot_clust3_novel.tsv
+grep -i "novel" filtered_B_BM_tot_filt_ranked_BC_clust4_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_B_BM_tot_clust4_novel.tsv
+grep -i "novel" filtered_B_BM_tot_filt_ranked_BC_clust5_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_B_BM_tot_clust5_novel.tsv
+grep -i "novel" filtered_B_BM_tot_filt_ranked_BC_clust6_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_B_BM_tot_clust6_novel.tsv
+grep -i "novel" filtered_B_BM_tot_filt_ranked_BC_clust7_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_B_BM_tot_clust7_novel.tsv
+grep -i "novel" filtered_B_BM_tot_filt_ranked_BC_clust8_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_B_BM_tot_clust8_novel.tsv
+grep -i "novel" filtered_B_BM_tot_filt_ranked_BC_clust9_B_ccsids.merge5.collapsed_corrected.5degfilter.sqanti_protein_classification.tsv > filtered_B_BM_tot_clust9_novel.tsv
