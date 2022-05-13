@@ -14,22 +14,22 @@
 #
 #----------------------------------
 # Get the data
-mkdir -p ../data
-mkdir -p ../data/BC_ranked_isoforms
+#mkdir -p ../data
+#mkdir -p ../data/BC_ranked_isoforms
 
-cd ../data/BC_ranked_isoforms
+#cd ../data/BC_ranked_isoforms
 
 #
 # Get the Full-length PacBio Consensus Fasta Files for the samples
 #
-cp /Users/annedeslattesmays/Scitechcon\ Dropbox/Anne\ DeslattesMays/Single_cell_analysis/scRNA\ paper/single\ cell\ Long\ Read\ Protein\ Analysis/Alin_neg.flnc_BC.fasta .
-cp /Users/annedeslattesmays/Scitechcon\ Dropbox/Anne\ DeslattesMays/Single_cell_analysis/scRNA\ paper/single\ cell\ Long\ Read\ Protein\ Analysis/Blin_neg.flnc_BC.fasta .
-cp /Users/annedeslattesmays/Scitechcon\ Dropbox/Anne\ DeslattesMays/Single_cell_analysis/scRNA\ paper/single\ cell\ Long\ Read\ Protein\ Analysis/B_BM_tot.flnc_BC.fasta .
+#cp /Users/annedeslattesmays/Scitechcon\ Dropbox/Anne\ DeslattesMays/Single_cell_analysis/scRNA\ paper/single\ cell\ Long\ Read\ Protein\ Analysis/Alin_neg.flnc_BC.fasta .
+#cp /Users/annedeslattesmays/Scitechcon\ Dropbox/Anne\ DeslattesMays/Single_cell_analysis/scRNA\ paper/single\ cell\ Long\ Read\ Protein\ Analysis/Blin_neg.flnc_BC.fasta .
+#cp /Users/annedeslattesmays/Scitechcon\ Dropbox/Anne\ DeslattesMays/Single_cell_analysis/scRNA\ paper/single\ cell\ Long\ Read\ Protein\ Analysis/B_BM_tot.flnc_BC.fasta .
 
 #
 # Get the barcoded ranked clusters
 #
-cp /Users/annedeslattesmays/Scitechcon\ Dropbox/Anne\ DeslattesMays/Single_cell_analysis/PacBio/single_cell_pipeline/BC-ranked_isoforms/BC_ranked_isoforms/*.csv .
+#cp /Users/annedeslattesmays/Scitechcon\ Dropbox/Anne\ DeslattesMays/Single_cell_analysis/PacBio/single_cell_pipeline/BC-ranked_isoforms/BC_ranked_isoforms/*.csv .
 
 Alin_neg_fasta="Alin_neg.flnc_BC.fasta"
 Blin_neg_fasta="Blin_neg.flnc_BC.fasta"
