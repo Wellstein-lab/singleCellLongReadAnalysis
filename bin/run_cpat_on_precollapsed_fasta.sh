@@ -26,7 +26,7 @@
 # assumes you have transeq
 #
 PWD=$(pwd)
-allprecollapse="*filt_ranked*_*B_ccsids.csv"
+allprecollapse="*_ccsids.fasta"
 
 for file in $allprecollapse; do
     name="${file%%.*}"
