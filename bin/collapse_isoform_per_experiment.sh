@@ -38,7 +38,7 @@
 # assumes you are in the directory and all items are here
 
 allexperiments="*_BC.fasta"
-reference_genome="../GRCh38.primary_assembly.genome.fa"
+reference_genome="GRCh38.primary_assembly.genome.fa"
 
 PWD=$(pwd)
 echo "Current Working Directory is = " $PWD
