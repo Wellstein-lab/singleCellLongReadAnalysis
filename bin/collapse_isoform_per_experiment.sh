@@ -43,7 +43,7 @@ reference_genome="GRCh38.primary_assembly.genome.fa"
 PWD=$(pwd)
 echo "Current Working Directory is = " $PWD
 
-for file in $allexeriments; do
+for file in $allexperiments; do
     name="$(basename "$file" .fasta)"
     bam=".bam"
     sortedbam=".sorted.bam"
@@ -79,7 +79,7 @@ for file in $allexeriments; do
     samtools view -bh $file_sam > $file_bam
     samtools sort $file_bam > $file_sorted_bam
     samtools view -h $file_sorted_bam > $file_sorted_sam
-    collapse_isoforms_by_sam.py --input $file -s $file_sorted_sam -c 0.99 -i 0.95 --gen_mol_count -o  $file_merge5
+     collapse_isoforms_by_sam.py --input $file -s $file_sorted_sam -c 0.0 -i 0.95 --gen_mol_count -o  $file_merge5
 #    bedtools bamtobed -bed12 -i $file_bam > $file_bed
 #    bedToGenePred $file_bed $file_genepred
 #    genePredToGtf "file" $file_genepred $file_gtf
