@@ -17,6 +17,7 @@ outdir="../favorite_genes/"
 testfile="B_BM_tot_filt_ranked_BC_clust1_B_ccsidscpat_linear_aa.fa"
 file=$testfile
 underscore="_"
+dot="."
 
 for file in $allseqsaa; do
 
@@ -40,63 +41,86 @@ for file in $allseqsaa; do
     # $ means match at the end
     # | pipe symbole
     # sed '/^--$/d' (piping the result of the grep through sed is required to remove the -- separator that grep adds)
+    # always define a variable
     
     # DDX5 isoforms begin with "MSGY"
-    grep -B1 "^MSGY" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%" >$outdir"DDX5.MSGY."$name$seqsaa
+    DDX5_MSGY="DDX5.MSGY"
+    grep -B1 "^MSGY" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$DDX5_MSGY$underscore\1%"    >$outdir$DDX5_MSGY$dot$name$seqsaa
     
     # DDX5 isoforms end in GYSQ
-    grep -B1 "GYSQ$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"DDX5.GYSQ."$name$seqsaa
-    grep -B1 "KRGG$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"DDX5.KRGG."$name$seqsaa
+    DDX5_GYSQ="DDX5.GYSQ"
+    grep -B1 "GYSQ$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$DDX5_GYSQ$underscore\1%"    >$outdir$DDX5_GYSQ$dot$name$seqsaa
+    DDX5_KRGG="DDX5.KRGG"
+    grep -B1 "KRGG$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$DDX5_KRGG$underscore\1%"    >$outdir$DDX5_KRGG$dot$name$seqsaa
 
     # MSKS is the beginning of both the HNRNPA1 isoforms
-    grep -B1 "^MSKS" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"   > $outdir"HNRNPA1.MSKS."$name$seqsaa
+    HNRNPA1_MSKS="HNRNPA1.MSKS"
+    grep -B1 "^MSKS" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$HNRNPA1_MSKS$underscore\1%" >$outdir$HNRNPA1_MSKS$dot$name$seqsaa
     
     # all HNRNPA1 isoforms end with GRRF
-    grep -B1 "GRRF$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"HNRNPA1.GRRF."$name$seqsaa
+    HNRNPA1_GRRF="HNRNPA1.GRRF"
+    grep -B1 "GRRF$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$HNRNPA1_GRRF$underscore\1%" >$outdir$HNRNPA1_GRRF$dot$name$seqsaa
     
     # QGGY is the ending of one of the HNRNPA1 features
-    grep -B1 "QGGY$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"HNRNPA1.QGGY."$name$seqsaa
+    HNRNPA1_QGGY="HNRNPA1.QGGY"
+    grep -B1 "QGGY$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$HNRNPA1_QGGY$underscore\1%" >$outdir$HNRNPA1_QGGY$dot$name$seqsaa
 
     # the HNRNPF isoform starts with MMLG
-    grep -B1 "^MMLG" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"HNRNPA1.MMLG."$name$seqsaa
+    HNRNPF_MMLG="HNRNPF.MMLG"
+    grep -B1 "^MMLG" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$HNRNPF_MMLG$underscore\1%"  >$outdir$HNRNPF_MMLG$dot$name$seqsaa
 
     # the HNRNPF isoform ends with GGYD
-    grep -B1 "GGYD$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"HNRNPF.GGYD."$name$seqsaa
+    HNRNPF_GGYD="HNRNPF.GGYD"
+    grep -B1 "GGYD$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$HNRNPF_GGYD$underscore\1%"  >$outdir$HNRNPF_GGYD$dot$name$seqsaa
 
     # the PFN1 isoform starts with MAGW
-    grep -B1 "^MAGW" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"PFN1.MAGW."$name$seqsaa
+    PFN1_MAGW="PFN1.MAGW"
+    grep -B1 "^MAGW" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$PFN1_MAGW$underscore\1%"    >$outdir$PFN1_MAGW$dot$name$seqsaa
 
     # the PFN1 isoform ends with RSQY
-    grep -B1 "RSQY$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"PFN1.RSQY."$name$seqsaa
+    PFN1_RSQY="PRN1.RSQY"
+    grep -B1 "RSQY$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$PFN1_RSQY$underscore\1%"    >$outdir$PFN1_RSQY$dot$name$seqsaa
 
     # the SMG1 isoforms 1 starts with MSRR
-    grep -B1 "^MSRR" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"SMG1.MSRR."$name$seqsaa
+    SMG1_MSRR="SMG1.MSRR"
+    grep -B1 "^MSRR" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$SMG1_MSRR$underscore\1%"    >$outdir$SMG1_MSRR$dot$name$seqsaa
 
     # the SMG1 isoforms 2 starts with MSYS
-    grep -B1 "^MSYS" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"SMG1.MSYS."$name$seqsaa
+    SMG1_MSYS="SMG1.MSYS"
+    grep -B1 "^MSYS" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$SMG1_MSYS$underscore\1%"    >$outdir$SMG1_MSYS$dot$name$seqsaa
 
     # the SMG1 isoforms 3 starts with MWAL
-    grep -B1 "^MWAL" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"SMG1.MWAL."$name$seqsaa
+    SMG1_MWAL="SMG1.MWAL"
+    grep -B1 "^MWAL" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$SMG1_MWAL$underscore\1%"    >$outdir$SMG1_MWAL$dot$name$seqsaa
 
     # the SMG1 isoforms 4 starts with MKKL
-    grep -B1 "^MKKL" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"SMG1.MKKL."$name$seqsaa
+    SMG1_MKKL="SMG1.MKKL"
+    grep -B1 "^MKKL" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$SMG1_MMKL$underscore\1%"    >$outdir$SMG1_MMKL$dot$name$seqsaa
     
     # all the 4 SMG1 isoforms all end in TAWV only present in clust5 Blin_neg_B (clust4 Alin_neg_AB)
-    grep -B1 "TAWV$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"SMG1.TAWV."$name$seqsaa
+    SMG1_TAMV="SMG1.TAMV"
+    grep -B1 "TAWV$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$SMG1_TAMV$underscore\1%"    >$outdir$SMG1_TAMV$dot$name$seqsaa
 
     # the SRSF5 isoforms 1,2 and 4 start with MSGC
-    grep -B1 "^MSGC" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"SRSF5.MSGC."$name$seqsaa
+    SRSF5_MSGC="SRSF5.MSGC"
+    grep -B1 "^MSGC" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$SRSF5_MSGC$underscore\1%"   >$outdir$SRSF5_MSGC$dot$name$seqsaa
     
     # there are 4 isoforms for SRSF5 with two different endings
-    grep -B1 "DSGN$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"SRSF5.DSGN."$name$seqsaa
-    grep -B1 "GWLH$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"SRSF5.GWLH."$name$seqsaa
+    SRSF5_DSGN="SRSF5.DSGN"
+    grep -B1 "DSGN$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$SRSF5_DSGN$underscore\1%"   >$outdir$SRSF5_DSGN$dot$name$seqsaa
+    SRSF5_GWLH="SRSF5.GWLH"
+    grep -B1 "GWLH$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$SRSF5_GWLH$underscore\1%"   >$outdir$SRSF5_GWLH$dot$name$seqsaa
 
     # all 4 SRSF7 isoforms start with MSRY
-    grep -B1 "^MSRY" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"SRSF7.MSRY."$name$seqsaa
+    SRSF7_MSRY="SRSF7.MSRY"
+    grep -B1 "^MSRY" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$SRSF7_MSRY$underscore\1%"  >$outdir$SRSF7_MSRY$dot$name$seqsaa
 
-    # there are 4 SRSF7 isoforms 
-    grep -B1 "ERMD$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"SRSF7.ERMD."$name$seqsaa
-    grep -B1 "NLRR$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"SRSF7.NLRR."$name$seqsaa
-    grep -B1 "RYLF$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore\1%"  >$outdir"SRSF7.RYLF."$name$seqsaa
+    # there are 4 SRSF7 isoforms
+    SRSF7_ERMD="SRSF7.ERMD"
+    grep -B1 "ERMD$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$SRSF7_ERMD$underscore\1%"  >$outdir$SRSF7_ERMD$dot$name$seqsaa
+    SRSF7_NLRR="SRSF7_NLRR"
+    grep -B1 "NLRR$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$SRSF7_NLRR$underscore\1%"  >$outdir$SRSF7_NLRR$dot$name$seqsaa
+    SRSF7_RYLF="SRSF7_RYLF"
+    grep -B1 "RYLF$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$SRSF7_RYLF$underscore\1%"  >$outdir$SRSF7_RYLF$dot$name$seqsaa
  
 done
