@@ -95,7 +95,7 @@ for file in $allseqsaa; do
 
     # the SMG1 isoforms 4 starts with MKKL
     SMG1_MKKL="SMG1.MKKL"
-    grep -B1 "^MKKL" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$SMG1_MMKL$underscore\1%"    >$outdir$SMG1_MMKL$dot$name$seqsaa
+    grep -B1 "^MKKL" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$name$underscore$SMG1_MKKL$underscore\1%"    >$outdir$SMG1_MKKL$dot$name$seqsaa
     
     # all the 4 SMG1 isoforms all end in TAWV only present in clust5 Blin_neg_B (clust4 Alin_neg_AB)
     SMG1_TAMV="SMG1.TAMV"
