@@ -118,9 +118,9 @@ for file in $allseqsaa; do
     # there are 4 SRSF7 isoforms
     SRSF7_ERMD="SRSF7.ERMD"
     grep -B1 "ERMD$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$SRSF7_ERMD$underscore$name$underscore\1%"  >$outdir$SRSF7_ERMD$dot$name$seqsaa
-    SRSF7_NLRR="SRSF7_NLRR"
+    SRSF7_NLRR="SRSF7.NLRR"
     grep -B1 "NLRR$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$SRSF7_NLRR$underscore$name$underscore\1%"  >$outdir$SRSF7_NLRR$dot$name$seqsaa
-    SRSF7_RYLF="SRSF7_RYLF"
+    SRSF7_RYLF="SRSF7.RYLF"
     grep -B1 "RYLF$" $file | sed '/^--$/d' | sed "s%^>\(.*\)%>$SRSF7_RYLF$underscore$name$underscore\1%"  >$outdir$SRSF7_RYLF$dot$name$seqsaa
  
 done
