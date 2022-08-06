@@ -67,7 +67,7 @@ for file in $allseqsaa; do
 
     # PFN1 isoforms start with MAGW
     # PFN1 isoforms end with RSQY
-    PFN1_MAGW="PFN1.MAGW_RSQY"
+    PFN1_MAGW_RSQY="PFN1.MAGW_RSQY"
     grep -B1 "^MAGW" $file | sed '/^--$/d' | grep -B1 "RSQY$" | sed '/^--$/d' | sed "s%^>\(.*\)%>$PFN1_MAGW_RSQY$underscore$name$underscore\1%"   >$outdir$PFN1_MAGW_RSQY$dot$name$seqsaa
 
     # SMG1 isoform 1 starts with MSRR
