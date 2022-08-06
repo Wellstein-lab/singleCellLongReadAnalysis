@@ -13,7 +13,7 @@
 
 allseqsaa="*_linear_aa.fa"
 seqsaa="_linear_aa.fa"
-outdir="../favorite_genes/"
+outdir="./"
 testfile="B_BM_tot_filt_ranked_BC_clust1_B_ccsidscpat_linear_aa.fa"
 file=$testfile
 underscore="_"
