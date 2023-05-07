@@ -37,7 +37,8 @@ best_orf=".best_orf"
 classification="_classification.5degfilter"
 pb_gene=".pb_gene"
 
-cd ../data/BC_ranked_isoforms
+#cd ../data/BC_ranked_isoforms
+cd $1
 PWD=$(pwd)
 
 allorfs="*.ORF_prob.tsv"
@@ -47,31 +48,19 @@ echo "allorfs                      = " $allorfs
 
 # loop through 
 for file in $allorfs; do
-    name="${file%%.*}"
-
-    name_merge5_corrected_5degfilter=$name$merge5$corrected$degfilter
-    name_merge5_corrected_5degfilter_orf_prob_best_tsv=$name$merge5$corrected$degfilter$orf_prob_best$tsv
-    name_merge5_corrected_5degfilter_orf_prob_tsv=$name$merge5$corrected$degfilter$orf_prob$tsv
-    name_merge5_corrected_5degfilter_orf_fasta=$name$merge5$corrected$degfilter$orf_fasta
-    name_merge5_corrected_5degfilter_no_orf=$name$merge5$corrected$degfilter$no_orf
-    name_merge5_corrected_5degfilter_best_orf_tsv=$name$merge5$corrected$degfilter$best_orf$tsv
-    name_merge5_corrected_5degfilter_fasta=$name$merge5$corrected$degfilter$fasta
-    name_merge5_corrected_5degfilter_classification_tsv=$name$merge5$corrected$degfilter$classification$tsv
-    name_merge5_corrected_5degfilter_classification_pb_gene_tsv=$name$merge5$corrected$degfilter$classification$pb_gene$tsv
-    name_merge5_corrected_gtf=$name$merge5$corrected$gtf
+    name="${file%%.ORF_prob.tsv}"
     
-    echo "file                                                    = " $file
+    echo "file                                                        = " $file
     echo "name                                                        = " $name
-    echo "name_merge5_corrected_5degfilter                            = " $name_merge5_corrected_5degfilter
-    echo "name_merge5_corrected_5degfilter_orf_prob_best_tsv          = " $name_merge5_corrected_5degfilter_orf_prob_best_tsv
-    echo "name_merge5_corrected_5degfilter_orf_prob_tsv               = " $name_merge5_corrected_5degfilter_orf_prob_tsv
-    echo "name_merge5_corrected_5degfilter_orf_fasta                  = " $name_merge5_corrected_5degfilter_orf_fasta
-    echo "name_merge5_corrected_5degfilter_no_orf                     = " $name_merge5_corrected_5degfilter_no_orf
-    echo "name_merge5_corrected_5degfilter_best_orf_tsv               = " $name_merge5_corrected_5degfilter_best_orf_tsv
-    echo "name_merge5_corrected_5degfilter_fasta                      = " $name_merge5_corrected_5degfilter_fasta
-    echo "name_merge5_corrected_5degfilter_classification_tsv         = " $name_merge5_corrected_5degfilter_classification_tsv
-    echo "name_merge5_corrected_5degfilter_classification_pb_gene_tsv = " $name_merge5_corrected_5degfilter_classification_pb_gene_tsv
-    echo "name_merge5_corrected_gtf                                   = " $name_merge5_corrected_gtf
+    echo "name_orf_prob_best_tsv          = " $name_merge5_corrected_5degfilter_orf_prob_best_tsv
+    echo "name_orf_prob_tsv               = " $name_merge5_corrected_5degfilter_orf_prob_tsv
+    echo "name_orf_fasta                  = " $name_merge5_corrected_5degfilter_orf_fasta
+    echo "name_no_orf                     = " $name_merge5_corrected_5degfilter_no_orf
+    echo "name_best_orf_tsv               = " $name_merge5_corrected_5degfilter_best_orf_tsv
+    echo "name_fasta                      = " $name_merge5_corrected_5degfilter_fasta
+    echo "name_classification_tsv         = " $name_merge5_corrected_5degfilter_classification_tsv
+    echo "name5degfilter_classification_pb_gene_tsv = " $name_merge5_corrected_5degfilter_classification_pb_gene_tsv
+    echo "namegtf                                   = " $name_merge5_corrected_gtf
     
     docker run -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base:v1.0 orf_calling.py \
 	   --orf_coord $name_merge5_corrected_5degfilter_orf_prob_tsv \

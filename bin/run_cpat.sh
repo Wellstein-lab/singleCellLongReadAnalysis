@@ -22,6 +22,12 @@
 #
 # get the Human hexamer and logit models needed by cpat
 #
+#--------------------------------
+#  name: run_cpat.sh
+#  parameters: $1 - the directory (can be absolute or relative)
+#              containing the data desired.
+#  output: cpat
+
 
 gtf=".gtf"
 fasta=".fasta"
@@ -32,7 +38,8 @@ degfilter=".5degfilter"
 sixframe=".6frame"
 classification_tsv=".5degfilter_classification.5degfilter.tsv"
 
-cd ../data/BC_ranked_isoforms
+#cd ../data/BC_ranked_isoforms
+cd $1
 
 PWD=$(pwd)
 echo "Current Working Directory is = " $PWD
@@ -48,21 +55,24 @@ human_logitmodel="Human_logitModel.RData"
 cpat_output="_cpat.out"
 cpat_error="_cpat.error"
 
-allfiltered="*_corrected.5degfilter.fasta"
+#allfiltered="*_corrected.5degfilter.fasta"
+allfiltered="*corrected.fasta"
 
 # loop through 
 for file in $allfiltered; do
-    name="${file%%.*}"
+    name="${file%%.fasta}"
 
-    name_merge5_corrected_5degfilter=$name$merge5$corrected$degfilter
-    name_merge5_corrected_5degfilter_cpat_output=$name$merge5$corrected$degfilter$cpat_output
-    name_merge5_corrected_5degfilter_cpat_error=$name$merge5$corrected$degfilter$cpat_error
+#    name_merge5_corrected_5degfilter=$name$merge5$corrected$degfilter
+#    name_merge5_corrected_5degfilter_cpat_output=$name$merge5$corrected$degfilter$cpat_output
+#    name_merge5_corrected_5degfilter_cpat_error=$name$merge5$corrected$degfilter$cpat_error
+
+    name_cpat_output=$name$cpat_output
+    name_cpat_error=$name$cpat_error
     
-    echo "file                                            = " $file
-    echo "name                                            = " $name
-    echo "name_merge5_corrected_5degfilter                = " $name_merge5_corrected_5degfilter
-    echo "name_merge5_corrected_5degfilter_cpat_output    = " $name_merge5_corrected_5degfilter_cpat_output
-    echo "name_merge5_corrected_5degfilter_cpat_error     = " $name_merge5_corrected_5degfilter_cpat_error
+    echo "file                = " $file
+    echo "name                = " $name"_cpat"
+    echo "name_cpat_output    = " $name_cpat_output
+    echo "name_cpat_error     = " $name_cpat_error
     
     docker run -v $PWD:$PWD -w $PWD -it gsheynkmanlab/cpat:addr cpat.py \
        -x $human_hexamer \
@@ -70,9 +80,9 @@ for file in $allfiltered; do
        -g $file \
        --min-orf=50 \
        --top-orf=50 \
-       -o $name_merge5_corrected_5degfilter \
-       1> $name_merge5_corrected_5degfilter_cpat_output \
-       2> $name_merge5_corrected_5degfilter_cpat_error
+       -o $name \
+       1> $name_cpat_output \
+       2> $name_cpat_error
 
 done
 

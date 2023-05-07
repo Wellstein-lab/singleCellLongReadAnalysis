@@ -31,7 +31,8 @@ pb_gene=".pb_gene.tsv"
 with_transcript="_with_transcript"
 no_transcript="_no_transcript"
 
-cd ../data/BC_ranked_isoforms
+#cd ../data/BC_ranked_isoforms
+cd .
 PWD=$(pwd)
 
 allorfprobbest="*.ORF_prob.best.tsv"
