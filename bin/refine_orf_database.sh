@@ -37,7 +37,8 @@ best_orf=".best_orf.tsv"
 classification="5degfilter_classification.5degfilter.tsv"
 coding_score_cutoff=0.364
 
-cd ../data/BC_ranked_isoforms
+#cd ../data/BC_ranked_isoforms
+cd $1
 PWD=$(pwd)
 
 #
@@ -52,7 +53,7 @@ echo "coding_score_cutoff          = " $coding_score_cutoff
 
 # loop through 
 for file in $allbestorfs; do
-    name="${file%%.*}"
+    name="${file%%.best_orf.tsv}"
 
     name_merge5_corrected_5degfilter_refined=$name$merge5$corrected$degfilter$refined
     name_merge5_corrected_5degfilter_fasta=$name$merge5$corrected$degfilter$fasta

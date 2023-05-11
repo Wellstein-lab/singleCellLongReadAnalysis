@@ -30,12 +30,12 @@ filtered="filtered_"
 corrected="_corrected"
 degfilter=".5degfilter"
 orf_prob_best=".ORF_prob.best"
-orf_prob=".ORF_prob"
+orf_prob_tsv=".ORF_prob.tsv"
 orf_fasta=".ORF_seqs.fa"
 no_orf=".no_ORF.txt"
-best_orf=".best_orf"
-classification="_classification.5degfilter"
-pb_gene=".pb_gene"
+best_orf_tsv=".best_orf.tsv"
+classification_tsv="_classification.tsv"
+pb_gene_tsv=".pb_gene.tsv"
 
 #cd ../data/BC_ranked_isoforms
 cd $1
@@ -49,29 +49,38 @@ echo "allorfs                      = " $allorfs
 # loop through 
 for file in $allorfs; do
     name="${file%%.ORF_prob.tsv}"
+    name_orf_prob_best_tsv=$name$orf_prob_best
+    name_orf_prob_tsv=$name$orf_prob_tsv
+    name_orf_fasta=$name$orf_fasta
+    name_no_orf=$name$no_orf
+    name_best_orf_tsv=$name$best_orf_tsv
+    name_fasta=$name$fasta
+    name_pb_gene_tsv=$name$pb_gene_tsv
+    name_classification_tsv=$name$classification_tsv
+    name_gtf=$name$gtf
     
-    echo "file                                                        = " $file
-    echo "name                                                        = " $name
-    echo "name_orf_prob_best_tsv          = " $name_merge5_corrected_5degfilter_orf_prob_best_tsv
-    echo "name_orf_prob_tsv               = " $name_merge5_corrected_5degfilter_orf_prob_tsv
-    echo "name_orf_fasta                  = " $name_merge5_corrected_5degfilter_orf_fasta
-    echo "name_no_orf                     = " $name_merge5_corrected_5degfilter_no_orf
-    echo "name_best_orf_tsv               = " $name_merge5_corrected_5degfilter_best_orf_tsv
-    echo "name_fasta                      = " $name_merge5_corrected_5degfilter_fasta
-    echo "name_classification_tsv         = " $name_merge5_corrected_5degfilter_classification_tsv
-    echo "name5degfilter_classification_pb_gene_tsv = " $name_merge5_corrected_5degfilter_classification_pb_gene_tsv
-    echo "namegtf                                   = " $name_merge5_corrected_gtf
+    echo "file                            = " $file
+    echo "name                            = " $name
+    echo "name_orf_prob_best_tsv          = " $name_orf_prob_best_tsv
+    echo "name_orf_prob_tsv               = " $name_orf_prob_tsv
+    echo "name_orf_fasta                  = " $name_orf_fasta
+    echo "name_no_orf                     = " $name_no_orf
+    echo "name_best_orf_tsv               = " $name_best_orf_tsv
+    echo "name_fasta                      = " $name_fasta
+    echo "name_classification_tsv         = " $name_classification_tsv
+    echo "name_pb_gene_tsv                = " $name_pb_gene_tsv
+    echo "name_gtf                        = " $name_gtf
     
     docker run -v $PWD:$PWD -w $PWD -it gsheynkmanlab/proteogenomics-base:v1.0 orf_calling.py \
-	   --orf_coord $name_merge5_corrected_5degfilter_orf_prob_tsv \
-	   --orf_fasta $name_merge5_corrected_5degfilter_orf_fasta \
+	   --orf_coord $name_orf_prob_tsv \
+	   --orf_fasta $name_orf_fasta \
 	   --gencode_gtf gencode.v32.primary_assembly.annotation.gtf \
-	   --sample_gtf $name_merge5_corrected_gtf \
-	   --pb_gene $name_merge5_corrected_5degfilter_classification_pb_gene_tsv \
-	   --classification $name_merge5_corrected_5degfilter_classification_tsv \
-	   --sample_fasta $name_merge5_corrected_5degfilter_fasta \
+	   --sample_gtf $name_gtf \
+	   --pb_gene $name_pb_gene_tsv \
+	   --classification $name_classification_tsv \
+	   --sample_fasta $name_fasta \
 	   --num_cores 8 \
-	   --output $name_merge5_corrected_5degfilter_best_orf_tsv
+	   --output $name_best_orf_tsv
     
 done
 

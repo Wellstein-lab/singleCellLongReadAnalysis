@@ -39,9 +39,11 @@ pb_gene=".pb_gene.tsv"
 pb_gene_tsv="pb_gene.tsv"
 
 
-cd ../data/BC_ranked_isoforms
+#cd ../data/BC_ranked_isoforms
+cd $1
+
 PWD=$(pwd)
-allsqanticlassification="filtered*5degfilter*classification*tsv"*
+allsqanticlassification=$(ls *classification.tsv)
 echo "Current Working Directory is = " $PWD
 
 #
@@ -49,12 +51,12 @@ echo "Current Working Directory is = " $PWD
 #
 for file in $allsqanticlassification; do
 
-    name="${file%%.*}"
-    name_merge5_corrected_5degfilter_classification_pb_gene=$name$merge5$corrected$classification$pb_gene
+    name="${file%%.tsv}"
+    name_pb_gene=$name$pb_gene
 
-    echo "file                                                    = " $file
-    echo "name                                                    = " $name
-    echo "name_merge5_corrected_5degfilter_classification_pb_gene = " $name_merge5_corrected_5degfilter_classification_pb_gene
+    echo "file= " $file
+    echo "name= " $name
+    echo "name= " $name_pb_gene
     
     docker run --rm -v $PWD:$PWD -w $PWD -it ghcr.io/adeslatt/transcriptome-summary-docker transcriptome_summary.py \
 	   --sq_out $file \
@@ -63,6 +65,6 @@ for file in $allsqanticlassification; do
 	   --len_stats gene_lens.tsv \
 	   --odir junk
    
-    mv $pb_gene_tsv $name_merge5_corrected_5degfilter_classification_pb_gene
+    mv $pb_gene_tsv $name_pb_gene
     
 done
