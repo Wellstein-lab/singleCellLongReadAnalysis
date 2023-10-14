@@ -48,11 +48,19 @@ while IFS= read -r line; do
         
         # Write the results to the output file
         echo "Experiment: $experiment_file" >> "$output_file"
+        echo "Experiment: $experiment_file"
         echo "Protein: $protein_name" >> "$output_file"
+        echo "Protein: $protein_name"
         echo "Domain Name: $domain_name" >> "$output_file"
+        echo "Domain Name: $domain_name" 
 	echo "AA_position: $aa_position" >> "$output_file"
+	echo "AA_position: $aa_position"
         echo "Domain: $domain_sequence" >> "$output_file"
+        echo "Domain: $domain_sequence"
         echo "Read Count: $read_count" >> "$output_file"
+	echo "read_count = $read_count"
         echo "---" >> "$output_file"
+        echo "output_file = $output_file"
+	read_count=0
     done
 done < "$data_file"
