@@ -41,6 +41,8 @@ The output then can be ingested into Google Chrome Sheets and used when making p
 
 ## Inputs for the experiment 
 
+* [`DDX5 - UniprotID:P17844`](https://github.com/Wellstein-lab/singleCellLongReadAnalysis/blob/main/data/protein_aa/ddx5_human_P17844.txt)
+
 
 ## Outputs for our experiment
 
