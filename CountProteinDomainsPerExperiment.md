@@ -39,3 +39,9 @@ This routine converts the the data into a wide matrix, which is easier for visua
 
 The output then can be ingested into Google Chrome Sheets and used when making publication ready tables.
 
+## Inputs for the experiment 
+
+
+## Outputs for our experiment
+
+
