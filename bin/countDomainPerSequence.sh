@@ -59,7 +59,7 @@ while IFS= read -r line; do
         echo "Domain: $domain_sequence"
         echo "Read Count: $read_count" >> "$output_file"
 	echo "read_count = $read_count"
-        echo "---" >> "$output_file"
+ #       echo "---" >> "$output_file"
         echo "output_file = $output_file"
 	read_count=0
     done
