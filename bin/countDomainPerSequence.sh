@@ -27,13 +27,8 @@ experiment_dir=$1
 #data_file="/path/to/protein_domain_data.txt"
 data_file=$2
 
-# Check if the data file exists
-#if [ ! -d "$data_file" ]; then
-#    echo "Error: Data file '$data_file' not found."
-#    exit 1
-#fi
-
 # Loop through each line in the data file
+first_time=1
 while IFS= read -r line; do
     # Split the line into protein name and domain sequence using ":" as a delimiter
     IFS=":" read -r protein_name domain_name aa_position domain_sequence <<< "$line"
@@ -45,22 +40,10 @@ while IFS= read -r line; do
         
         # Generate the output filename based on the input experiment file
         output_file="${experiment_file##*/}_results.txt"
-        
-        # Write the results to the output file
-        echo "Experiment: $experiment_file" >> "$output_file"
-        echo "Experiment: $experiment_file"
-        echo "Protein: $protein_name" >> "$output_file"
-        echo "Protein: $protein_name"
-        echo "Domain_Name: $domain_name" >> "$output_file"
-        echo "Domain_Name: $domain_name" 
-	echo "AA_position: $aa_position" >> "$output_file"
-	echo "AA_position: $aa_position"
-        echo "Domain: $domain_sequence" >> "$output_file"
-        echo "Domain: $domain_sequence"
-        echo "Read_Count: $read_count" >> "$output_file"
-	echo "read_count = $read_count"
- #       echo "---" >> "$output_file"
-        echo "output_file = $output_file"
-	read_count=0
+        if (($first_time == 1));  then
+	    echo "Protein,Domain_Name,AA_position,Domain_Sequence,$experiment_file" > "$output_file"
+	    first_time=0
+	fi
+        echo "$protein_name,$domain_name,$aa_position,$domain_sequence,$read_count" >> $output_file
     done
 done < "$data_file"
