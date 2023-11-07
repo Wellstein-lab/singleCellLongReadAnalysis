@@ -46,4 +46,6 @@ The output then can be ingested into Google Chrome Sheets and used when making p
 
 ## Outputs for our experiment
 
+* [`DDX5 - Domain Read Counts per Experiment`](https://github.com/Wellstein-lab/singleCellLongReadAnalysis/blob/main/data/protein_domain_counts/DDX5_Domain_results_wide_matrix.csv)
+
 
