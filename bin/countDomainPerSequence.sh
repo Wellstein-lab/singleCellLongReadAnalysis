@@ -41,9 +41,9 @@ while IFS= read -r line; do
         # Generate the output filename based on the input experiment file
         output_file="${experiment_file##*/}_results.txt"
         if (($first_time == 1));  then
-	    echo "Protein,Domain_Name,AA_position,Domain_Sequence,$experiment_file" > "$output_file"
+	    echo "Protein Domain_Name AA_position Domain_Sequence $experiment_file" > "$output_file"
 	    first_time=0
 	fi
-        echo "$protein_name,$domain_name,$aa_position,$domain_sequence,$read_count" >> $output_file
+        echo "$protein_name $domain_name $aa_position $domain_sequence $read_count" >> $output_file
     done
 done < "$data_file"
