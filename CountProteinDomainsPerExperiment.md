@@ -45,19 +45,19 @@ The `make_protein_counts_matrix.py` routine is a python script that creates a di
 
 ### Protein Family and Domain Definition Files
 
-* [`CD14 - UniprotID:P08571'](https://zenodo.org/records/10576720/files/CD14_human_P08571.txt?)
+* [`CD14 - UniprotID:P08571`](https://zenodo.org/records/10576720/files/CD14_human_P08571.txt?)
 * [`DDX5 - UniprotID:P17844`](https://zenodo.org/records/10576720/files/DDX5_human_P17844.txt?)
-* [`HDGF - UniprotID:P51858'](https://zenodo.org/records/10576720/files/HDGF_human_P51858.txt?)
-* ['HNRNPA1 - UniprotID:P09651'](https://zenodo.org/records/10576720/files/HNRNPA1_human_P09651.txt?)
-* [`HNRNPF - UniprotID:P52597'](https://zenodo.org/records/10576720/files/HNRNPF_human_P52597.txt?)
-* ['LMO2 - UniprotID:P25791'](https://zenodo.org/records/10576720/files/LMO2_human_P25791.txt?)
-* ['PHIP - UniprotID:Q8WWQ0'](https://zenodo.org/records/10576720/files/PHIP_human_Q8WWQ0.txt?)
-* ['PLD4 - UniprotID:Q96BZ4'](https://zenodo.org/records/10576720/files/PLD4_human_Q96BZ4.txt?)
-* ['PLEKHO1 - UniprotID:Q53GL0'](https://zenodo.org/records/10576720/files/PLEKHO1_human_Q53GL0.txt?)
-* ['SRSF5 - UniprotID:Q13243'](https://zenodo.org/records/10576720/files/SRSF5_human_Q13243.txt?)
-* ['SRSF7 - UniprotID:Q16629'](https://zenodo.org/records/10576720/files/SRSF7_human_Q16629.txt?)
-* ['USP15 - UniprotID:Q9Y4EB'](https://zenodo.org/records/10576720/files/USP15_human_Q9Y4E8.txt?)
-* ['VISTA - UniprotID:Q9H7M9'](https://zenodo.org/records/10576720/files/VISTA_human_Q9H7M9.txt?)
+* [`HDGF - UniprotID:P51858`](https://zenodo.org/records/10576720/files/HDGF_human_P51858.txt?)
+* [`HNRNPA1 - UniprotID:P09651`](https://zenodo.org/records/10576720/files/HNRNPA1_human_P09651.txt?)
+* [`HNRNPF - UniprotID:P52597`](https://zenodo.org/records/10576720/files/HNRNPF_human_P52597.txt?)
+* [`LMO2 - UniprotID:P25791`](https://zenodo.org/records/10576720/files/LMO2_human_P25791.txt?)
+* [`PHIP - UniprotID:Q8WWQ0`](https://zenodo.org/records/10576720/files/PHIP_human_Q8WWQ0.txt?)
+* [`PLD4 - UniprotID:Q96BZ4`](https://zenodo.org/records/10576720/files/PLD4_human_Q96BZ4.txt?)
+* [`PLEKHO1 - UniprotID:Q53GL0`](https://zenodo.org/records/10576720/files/PLEKHO1_human_Q53GL0.txt?)
+* [`SRSF5 - UniprotID:Q13243`](https://zenodo.org/records/10576720/files/SRSF5_human_Q13243.txt?)
+* [`SRSF7 - UniprotID:Q16629`](https://zenodo.org/records/10576720/files/SRSF7_human_Q16629.txt?)
+* [`USP15 - UniprotID:Q9Y4EB`](https://zenodo.org/records/10576720/files/USP15_human_Q9Y4E8.txt?)
+* [`VISTA - UniprotID:Q9H7M9`](https://zenodo.org/records/10576720/files/VISTA_human_Q9H7M9.txt?)
 
 
 ## Outputs for our experiment
