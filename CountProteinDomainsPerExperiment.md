@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10576685.svg)](https://doi.org/10.5281/zenodo.10576685)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10576720.svg)](https://doi.org/10.5281/zenodo.10576720)
 
 # Steps for Counting Protein Domains per experiment
 
@@ -35,19 +35,51 @@ The [countDomainPerExperiment.sh](https://github.com/Wellstein-lab/singleCellLon
 This routine counts the number of reads that the protein domain may be found in.
 This could be supportive evidence for putative alternative function for the particular transcript isoforms.
 
-3. Run [make_wide.py](https://github.com/Wellstein-lab/singleCellLongReadAnalysis/blob/main/bin/countDomainPerSequence.sh)
+3. Run [make_protein_counts_matrix.py](https://github.com/Wellstein-lab/singleCellLongReadAnalysis/blob/main/bin/make_protein_counts_matrix.py)
 
-This routine converts the the data into a wide matrix, which is easier for visualization and analysis.
+The `make_protein_counts_matrix.py` routine is a python script that creates a dictionary with key being made up of a 4-tuple that includes the Protein Name, Family or Domain name, the amino acid positions, then the amino acid sequence itself.  Then for each of the experiments that were run - the counts contained in the files for each of the proteins run from the previous step are the values per file so that a matrix is made unique to this combination.
 
-The output then can be ingested into Google Chrome Sheets and used when making publication ready tables.
+
 
 ## Inputs for the experiment 
 
-* [`DDX5 - UniprotID:P17844`](https://github.com/Wellstein-lab/singleCellLongReadAnalysis/blob/main/data/protein_aa/ddx5_human_P17844.txt)
+### Protein Family and Domain Definition Files
+
+* [`CD14 - UniprotID:P08571'](https://zenodo.org/records/10576720/files/CD14_human_P08571.txt?)
+* [`DDX5 - UniprotID:P17844`](https://zenodo.org/records/10576720/files/DDX5_human_P17844.txt?)
+* [`HDGF - UniprotID:P51858'](https://zenodo.org/records/10576720/files/HDGF_human_P51858.txt?)
+* ['HNRNPA1 - UniprotID:P09651'](https://zenodo.org/records/10576720/files/HNRNPA1_human_P09651.txt?)
+* [`HNRNPF - UniprotID:P52597'](https://zenodo.org/records/10576720/files/HNRNPF_human_P52597.txt?)
+* ['LMO2 - UniprotID:P25791'](https://zenodo.org/records/10576720/files/LMO2_human_P25791.txt?)
+* ['PHIP - UniprotID:Q8WWQ0'](https://zenodo.org/records/10576720/files/PHIP_human_Q8WWQ0.txt?)
+* ['PLD4 - UniprotID:Q96BZ4'](https://zenodo.org/records/10576720/files/PLD4_human_Q96BZ4.txt?)
+* ['PLEKHO1 - UniprotID:Q53GL0'](https://zenodo.org/records/10576720/files/PLEKHO1_human_Q53GL0.txt?)
+* ['SRSF5 - UniprotID:Q13243'](https://zenodo.org/records/10576720/files/SRSF5_human_Q13243.txt?)
+* ['SRSF7 - UniprotID:Q16629'](https://zenodo.org/records/10576720/files/SRSF7_human_Q16629.txt?)
+* ['USP15 - UniprotID:Q9Y4EB'](https://zenodo.org/records/10576720/files/USP15_human_Q9Y4E8.txt?)
+* ['VISTA - UniprotID:Q9H7M9'](https://zenodo.org/records/10576720/files/VISTA_human_Q9H7M9.txt?)
 
 
 ## Outputs for our experiment
 
-* [`DDX5 - Domain Read Counts per Experiment`](https://github.com/Wellstein-lab/singleCellLongReadAnalysis/blob/main/data/protein_domain_counts/DDX5_Domain_results_wide_matrix.csv)
+* [`CD14 - Domain Read Counts per Experiment`](https://zenodo.org/records/10576720/files/CD14_protein_domain_counts.csv?)
+* [`DDX5 - Domain Read Counts per Experiment`](https://zenodo.org/records/10576720/files/DDX5_protein_domain_counts.csv?)
+* [`HDGF - Domain Read Counts per Experiment`](https://zenodo.org/records/10576720/files/HDGF_protein_domain_counts.csv?)
+* [`HNRNPA1 - Domain Read Counts per Experiment`](https://zenodo.org/records/10576720/files/HNRNPA1_protein_domain_counts.csv?)
+* [`HNRNPF - Domain Read Counts per Experiment`](https://zenodo.org/records/10576720/files/HNRNPF_protein_domain_counts.csv?)
+* [`LMO2 - Domain Read Counts per Experiment`](https://zenodo.org/records/10576720/files/LMO2_protein_domain_counts.csv?)
+* [`PHIP - Domain Read Counts per Experiment`](https://zenodo.org/records/10576720/files/PHIP_protein_domain_counts.csv?)
+* [`PLD4 - Domain Read Counts per Experiment`](https://zenodo.org/records/10576720/files/PLD4_protein_domain_counts.csv?)
+* [`PLEKHO1 - Domain Read Counts per Experiment`](https://zenodo.org/records/10576720/files/PLEKHO1_protein_domain_counts.csv?)
+* [`SRSF5 - Domain Read Counts per Experiment`](https://zenodo.org/records/10576720/files/SRSF5_protein_domain_counts.csv?)
+* [`SRSF7 - Domain Read Counts per Experiment`](https://zenodo.org/records/10576720/files/SRSF7_protein_domain_counts.csv?)
+* [`USP15 - Domain Read Counts per Experiment`](https://zenodo.org/records/10576720/files/USP15_protein_domain_counts.csv?)
+* [`VISTA - Domain Read Counts per Experiment`](https://zenodo.org/records/10576720/files/VISTA_protein_domain_counts.csv?)
+
+
+
+
+
+
 
 
