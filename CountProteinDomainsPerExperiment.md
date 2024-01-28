@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10576685.svg)](https://doi.org/10.5281/zenodo.10576685)
+
 # Steps for Counting Protein Domains per experiment
 
 ## Count Protein Domains Per Experiment
