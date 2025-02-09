@@ -27,18 +27,8 @@
 #  parameters: $1 - the directory (can be absolute or relative)
 #              containing the data desired.
 #  output: cpat
+#--------------------------------
 
-
-gtf=".gtf"
-fasta=".fasta"
-merge5=".merge5.collapsed"
-filtered="filtered_"
-corrected="_corrected"
-degfilter=".5degfilter"
-sixframe=".6frame"
-classification_tsv=".5degfilter_classification.5degfilter.tsv"
-
-#cd ../data/BC_ranked_isoforms
 cd $1
 
 PWD=$(pwd)
@@ -55,16 +45,11 @@ human_logitmodel="Human_logitModel.RData"
 cpat_output="_cpat.out"
 cpat_error="_cpat.error"
 
-#allfiltered="*_corrected.5degfilter.fasta"
 allfiltered="*corrected.fasta"
 
 # loop through 
 for file in $allfiltered; do
     name="${file%%.fasta}"
-
-#    name_merge5_corrected_5degfilter=$name$merge5$corrected$degfilter
-#    name_merge5_corrected_5degfilter_cpat_output=$name$merge5$corrected$degfilter$cpat_output
-#    name_merge5_corrected_5degfilter_cpat_error=$name$merge5$corrected$degfilter$cpat_error
 
     name_cpat_output=$name$cpat_output
     name_cpat_error=$name$cpat_error
